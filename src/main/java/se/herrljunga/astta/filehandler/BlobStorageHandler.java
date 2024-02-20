@@ -5,7 +5,6 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
-import se.herrljunga.astta.utils.Config;
 import se.herrljunga.astta.utils.Utils;
 
 import java.io.ByteArrayOutputStream;

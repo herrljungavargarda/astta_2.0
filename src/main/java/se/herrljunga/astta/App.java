@@ -1,19 +1,14 @@
 package se.herrljunga.astta;
 
 import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageConfig;
-import se.herrljunga.astta.analyze.Analyze;
-import se.herrljunga.astta.analyze.AnalyzeImpl;
 import se.herrljunga.astta.analyze.OpenAIAnalyzer;
 import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.filehandler.BlobStorageHandler;
 import se.herrljunga.astta.speechtotext.SpeechToText;
 import se.herrljunga.astta.speechtotext.SpeechToTextImpl;
-import se.herrljunga.astta.utils.Config;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 
