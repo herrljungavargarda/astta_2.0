@@ -1,0 +1,41 @@
+TRANSCRIBED: Text=Välkommen till södertydesk. Du pratar med Alexander. Speaker ID=Guest-1
+Detected language: sv-SE
+TRANSCRIBED: Text=Ja hej, det var rova på wakedine heter jag jag. Speaker ID=Guest-2
+TRANSCRIBED: Text=Jobbar på lindbladsskolan i Vårgårda. Speaker ID=Guest-2
+TRANSCRIBED: Text=Ja hej, innan jag hjälper dig bara så har jag en fråga. Speaker ID=Guest-1
+TRANSCRIBED: Text=Jag skulle vilja spela in detta samtalet i kvalitets och träningssyfte för att träna en AI. Speaker ID=Guest-1
+TRANSCRIBED: Text=Okej, är det okej om jag gör det med dig här? Speaker ID=Guest-1
+TRANSCRIBED: Text=Ja, jag inser att jag. Jag har inte riktigt säkert om jag kommer behöva hjälp nu, för jag ska bara se. Speaker ID=Guest-2
+TRANSCRIBED: Text=Lite här ja. Speaker ID=Guest-2
+TRANSCRIBED: Text=Men ja det går bra. Det går bra. Speaker ID=Guest-2
+TRANSCRIBED: Text=Hur verkar det? Speaker ID=Guest-3
+TRANSCRIBED: Text=Ja alltså grejen är att jag mitt lösenord har gått ut. Speaker ID=Guest-2
+TRANSCRIBED: Text=Och jag sitter hemma. Jag undrar om det går att ändra lösenord. Speaker ID=Guest-2
+TRANSCRIBED: Text=Om lösningen ja lösenordet har gått ut, så måste du få hjälp av oss så att byta. Speaker ID=Guest-1
+TRANSCRIBED: Text=Så då kan vi hjälpa dig med det nu direkt här över telefon. Speaker ID=Guest-1
+TRANSCRIBED: Text=Ja, du kan göra det även om jag är hemma och inte på. Speaker ID=Guest-2
+TRANSCRIBED: Text=Jobbet nätet jajamän det är inga konstigheter. Speaker ID=Guest-1
+TRANSCRIBED: Text=Men, om du ger mig ett par sekunder bara så ska jag logga in på min dator här. Speaker ID=Guest-1
+TRANSCRIBED: Text=Ska vi se. Speaker ID=Guest-1
+TRANSCRIBED: Text=Då ska vi se. Speaker ID=Guest-1
+TRANSCRIBED: Text=97 0 4 0 1. Speaker ID=Guest-2
+TRANSCRIBED: Text=Ja. Speaker ID=Guest-1
+TRANSCRIBED: Text=Vi har 4 sista jättegärna 44, 49 och vad heter du sa du moatil jajamän vart jobbar du någonstans? Speaker ID=Guest-1
+TRANSCRIBED: Text=På lindahlskolan, lindbladskolan och vem är din chef? Speaker ID=Guest-1
+TRANSCRIBED: Text=Alltid är jättebra. Speaker ID=Guest-2
+TRANSCRIBED: Text=Så. Speaker ID=Guest-1
+TRANSCRIBED: Text=Ska vi se. Speaker ID=Guest-1
+TRANSCRIBED: Text=Så där, då har jag bytt ditt lösenord till tomatsoppa tjugotjugofyra med stor bokstav i början. Speaker ID=Guest-1
+TRANSCRIBED: Text=Skänkte nu. Vem sa du? Speaker ID=Guest-2
+TRANSCRIBED: Text=Tomatsoppa 20 24 med stor bokstav i början. Speaker ID=Guest-1
+TRANSCRIBED: Text=Toppar 20 24 jajamän då avbryter jag. Speaker ID=Guest-2
+TRANSCRIBED: Text=Ja vi har loggade in. Speaker ID=Guest-2
+TRANSCRIBED: Text=Och skulle du försöka byta med dikaste jag inte kunde byta, så nu är jag in. Speaker ID=Guest-2
+TRANSCRIBED: Text=Men är du där på min? Speaker ID=Guest-2
+TRANSCRIBED: Text=Får jag testa här med att jag har. Speaker ID=Guest-2
+TRANSCRIBED: Text=Det kollat. Vad sa du nu? Speaker ID=Guest-1
+TRANSCRIBED: Text=Får jag bara teska här så? Speaker ID=Guest-2
+TRANSCRIBED: Text=Jag. Speaker ID=Guest-1
+TRANSCRIBED: Text=Nu nu funkar det. Speaker ID=Guest-2
+TRANSCRIBED: Text=Tack så mycket, det var slut, så ha det bra nu tack. Speaker ID=Guest-1
+TRANSCRIBED: Text=Hej. Speaker ID=Guest-1
