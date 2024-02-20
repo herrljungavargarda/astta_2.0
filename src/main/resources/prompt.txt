@@ -1,11 +1,16 @@
 AI Text Analyst Task: Generate a .JSON file from text.
-Elements: Summary, Keyword, PII removal, Caller Satisfaction (0-5), Number of Speakers.
+Elements: Summary, Keyword, PII removal, Caller Satisfaction (0-10), Number of Speakers.
 
 Steps:
 1. Extract Summary: Summarize key points. Remove any PII and password.
-2. Identify Keyword: Choose from (password, email, car, internet, printer, other).
-3. Assess Caller Satisfaction: Give a 0-5 score based on sentiment.
+2. Identify Keyword: Choose a keyword from the following alternatives that describes the call best: ("password", "email", "car", "internet", "printer").
+3. Assess Caller Satisfaction: Give a 0-10 score based on sentiment.
 4. Count Speakers: Identify distinct speakers.
 
 Output Format:
-{"Summary": "Concise summary","Keyword": "Central keyword","CallerSatisfaction": "Satisfaction score","NumberOfSpeakers": "Speaker count"}
+{
+    "Summary": "Concise summary",
+    "Keyword": "Central keyword",
+    "CallerSatisfaction": "Satisfaction score",
+    "NumberOfSpeakers": "Speaker count"
+}

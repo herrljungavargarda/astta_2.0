@@ -1,14 +1,22 @@
 package se.herrljunga.astta;
 
 import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageConfig;
+import se.herrljunga.astta.analyze.Analyze;
+import se.herrljunga.astta.analyze.AnalyzeImpl;
 import se.herrljunga.astta.analyze.OpenAIAnalyzer;
 import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.filehandler.BlobStorageHandler;
 import se.herrljunga.astta.speechtotext.SpeechToText;
 import se.herrljunga.astta.speechtotext.SpeechToTextImpl;
+import se.herrljunga.astta.utils.Config;
+import se.herrljunga.astta.utils.Utils;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -28,6 +36,9 @@ public class App {
         StorageHandler textformatBlobStorage = new BlobStorageHandler(Config.blobStorageEndpoint,
                 Config.blobSasToken,
                 Config.textSaveContainerName);
+        StorageHandler powerBiBlobStorage = new BlobStorageHandler(Config.blobStorageEndpoint,
+                Config.blobSasToken,
+                Config.powerBiContainerName);
 
         try {
             // AI analyzer of text:
@@ -40,9 +51,15 @@ public class App {
             String result = Files.readAllLines(Paths.get(filePath))
                     .stream().collect(Collectors.joining(System.lineSeparator()));
 
-            OpenAIAnalyzer analyzer = new OpenAIAnalyzer(Config.openAiKey, Config.openAiEndpoint, "test");
-            analyzer.analyze(result, "sv-SE");
+            OpenAIAnalyzer analyzer = new OpenAIAnalyzer(Config.openAiKey, Config.openAiEndpoint, "testGpt4");
+            String analyzedText = analyzer.analyze(result, "sv-SE");
+            System.out.println("Analyzed text: " + analyzedText);
+
             // Remove sensitive data:
+            String jsonFilePath = "src/main/resources/call3.json";
+            Utils.writeToFile(jsonFilePath, analyzedText);
+
+            powerBiBlobStorage.saveFile(jsonFilePath);
 
             //Analyze analyze = new AnalyzeImpl(Config.languageKey, Config.languageEndpoint);
             //analyze.removeSensitiveInformation("");
@@ -72,4 +89,6 @@ public class App {
         //stt.speechToText(result.get(0));
 
     }
+
+
 }

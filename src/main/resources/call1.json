@@ -1,0 +1,6 @@
+{
+    "Summary": "The user named 'example_user' has difficulty connecting to the company's VPN and always receives an error message. The Helpdesk agent attempted to troubleshoot, suggesting checking the username and password, and investigating potential conflicts with antivirus software. Despite these efforts, the problem could not be resolved during the call. The agent has escalated the issue to the network team for further inspection.",
+    "Keyword": "internet",
+    "CallerSatisfaction": 7,
+    "NumberOfSpeakers": 2
+}

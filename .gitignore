@@ -42,3 +42,5 @@ build/
 
 #Ignore config file to not expose secrets
 /src/main/java/se/herrljunga/astta/utils/Config.java
+
+/src/main/resources/exampleText.txt

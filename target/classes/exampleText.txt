@@ -1,41 +1,37 @@
-TRANSCRIBED: Text=Välkommen till södertydesk. Du pratar med Alexander. Speaker ID=Guest-1
-Detected language: sv-SE
-TRANSCRIBED: Text=Ja hej, det var rova på wakedine heter jag jag. Speaker ID=Guest-2
-TRANSCRIBED: Text=Jobbar på lindbladsskolan i Vårgårda. Speaker ID=Guest-2
-TRANSCRIBED: Text=Ja hej, innan jag hjälper dig bara så har jag en fråga. Speaker ID=Guest-1
-TRANSCRIBED: Text=Jag skulle vilja spela in detta samtalet i kvalitets och träningssyfte för att träna en AI. Speaker ID=Guest-1
-TRANSCRIBED: Text=Okej, är det okej om jag gör det med dig här? Speaker ID=Guest-1
-TRANSCRIBED: Text=Ja, jag inser att jag. Jag har inte riktigt säkert om jag kommer behöva hjälp nu, för jag ska bara se. Speaker ID=Guest-2
-TRANSCRIBED: Text=Lite här ja. Speaker ID=Guest-2
-TRANSCRIBED: Text=Men ja det går bra. Det går bra. Speaker ID=Guest-2
-TRANSCRIBED: Text=Hur verkar det? Speaker ID=Guest-3
-TRANSCRIBED: Text=Ja alltså grejen är att jag mitt lösenord har gått ut. Speaker ID=Guest-2
-TRANSCRIBED: Text=Och jag sitter hemma. Jag undrar om det går att ändra lösenord. Speaker ID=Guest-2
-TRANSCRIBED: Text=Om lösningen ja lösenordet har gått ut, så måste du få hjälp av oss så att byta. Speaker ID=Guest-1
-TRANSCRIBED: Text=Så då kan vi hjälpa dig med det nu direkt här över telefon. Speaker ID=Guest-1
-TRANSCRIBED: Text=Ja, du kan göra det även om jag är hemma och inte på. Speaker ID=Guest-2
-TRANSCRIBED: Text=Jobbet nätet jajamän det är inga konstigheter. Speaker ID=Guest-1
-TRANSCRIBED: Text=Men, om du ger mig ett par sekunder bara så ska jag logga in på min dator här. Speaker ID=Guest-1
-TRANSCRIBED: Text=Ska vi se. Speaker ID=Guest-1
-TRANSCRIBED: Text=Då ska vi se. Speaker ID=Guest-1
-TRANSCRIBED: Text=97 0 4 0 1. Speaker ID=Guest-2
-TRANSCRIBED: Text=Ja. Speaker ID=Guest-1
-TRANSCRIBED: Text=Vi har 4 sista jättegärna 44, 49 och vad heter du sa du moatil jajamän vart jobbar du någonstans? Speaker ID=Guest-1
-TRANSCRIBED: Text=På lindahlskolan, lindbladskolan och vem är din chef? Speaker ID=Guest-1
-TRANSCRIBED: Text=Alltid är jättebra. Speaker ID=Guest-2
-TRANSCRIBED: Text=Så. Speaker ID=Guest-1
-TRANSCRIBED: Text=Ska vi se. Speaker ID=Guest-1
-TRANSCRIBED: Text=Så där, då har jag bytt ditt lösenord till tomatsoppa tjugotjugofyra med stor bokstav i början. Speaker ID=Guest-1
-TRANSCRIBED: Text=Skänkte nu. Vem sa du? Speaker ID=Guest-2
-TRANSCRIBED: Text=Tomatsoppa 20 24 med stor bokstav i början. Speaker ID=Guest-1
-TRANSCRIBED: Text=Toppar 20 24 jajamän då avbryter jag. Speaker ID=Guest-2
-TRANSCRIBED: Text=Ja vi har loggade in. Speaker ID=Guest-2
-TRANSCRIBED: Text=Och skulle du försöka byta med dikaste jag inte kunde byta, så nu är jag in. Speaker ID=Guest-2
-TRANSCRIBED: Text=Men är du där på min? Speaker ID=Guest-2
-TRANSCRIBED: Text=Får jag testa här med att jag har. Speaker ID=Guest-2
-TRANSCRIBED: Text=Det kollat. Vad sa du nu? Speaker ID=Guest-1
-TRANSCRIBED: Text=Får jag bara teska här så? Speaker ID=Guest-2
-TRANSCRIBED: Text=Jag. Speaker ID=Guest-1
-TRANSCRIBED: Text=Nu nu funkar det. Speaker ID=Guest-2
-TRANSCRIBED: Text=Tack så mycket, det var slut, så ha det bra nu tack. Speaker ID=Guest-1
-TRANSCRIBED: Text=Hej. Speaker ID=Guest-1
+Användare: Hej, jag har problem med att skriva ut från min dator. Den verkar inte kunna ansluta till skrivaren längre.
+
+Helpdesk-agent: Hej där! Jag ska gärna hjälpa dig att lösa det. Kan du berätta vilken skrivare det gäller och om det här problemet är nytt eller om det har fungerat tidigare?
+
+Användare: Skrivaren är en HP LaserJet Pro M402dw, och ja, den har fungerat utan problem fram tills nu.
+
+Helpdesk-agent: Förstår. Låt mig titta på några saker. Kan du kontrollera om skrivaren är korrekt ansluten till din dator och att den är påslagen?
+
+Användare: Jag har just kontrollerat det, och ja, skrivaren är korrekt ansluten och påslagen.
+
+Helpdesk-agent: Bra, låt oss fortsätta felsökningen. Har du nyligen installerat några nya program eller uppdateringar på din dator?
+
+Användare: Jag tror inte det, men jag kan inte vara helt säker.
+
+Helpdesk-agent: Förstått. Låt oss försöka uppdatera drivrutinerna för skrivaren och se om det hjälper. Kan du gå till Enhetschefaren på din dator, hitta skrivaren och försöka uppdatera dess drivrutin?
+
+Användare: Ja, jag kan göra det. Ett ögonblick...
+
+Användare: Jag har uppdaterat drivrutinerna för skrivaren, men det verkar fortfarande inte fungera.
+
+Helpdesk-agent: Tack för att du försökte det. Nästa steg skulle vara att kontrollera om det finns några felmeddelanden eller indikationer på varför utskrifterna misslyckas. Kan du kolla Skrivarkön eller händelseloggen för att se om det finns några fel där?
+
+Användare: Jag ska göra det. Ett ögonblick...
+
+Användare: Det verkar som att utskrifterna fastnar i kön och sedan misslyckas med att skriva ut. Det finns ett meddelande om "pappersstopp" men jag ser inget papper fastnat i skrivaren.
+
+Helpdesk-agent: Det låter som ett pappersmatningsproblem. Ibland kan även små bitar av papper fastna och orsaka detta. Kan du försiktigt öppna skrivaren och kontrollera om det finns några pappersrester som kan hindra papperet från att matas ordentligt?
+
+Användare: Jag ska kolla. Ett ögonblick...
+
+Användare: Jag hittade faktiskt en liten bit papper som fastnat längst inne i skrivaren. Jag tog bort den, och nu verkar skrivaren fungera som den ska igen!
+
+Helpdesk-agent: Fantastiskt! Det är bra att du lyckades identifiera och åtgärda problemet. Om du stöter på några fler problem är du välkommen att kontakta oss när som helst.
+
+Användare: Tack så mycket för din hjälp och vägledning.
+
+Helpdesk-agent: Ingen orsak alls, det är vad vi är här för. Ha en underbar dag!

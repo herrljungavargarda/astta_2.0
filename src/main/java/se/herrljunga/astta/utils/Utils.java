@@ -7,6 +7,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -60,7 +61,10 @@ public class Utils {
     }
 
     public static String removePathFromFilename(String path){ //Remove "src/main/temp/" from file name
-        return path.replace(Config.pathToTemp, "");
+
+        String[] result = path.split("/");
+        return result[result.length-1];
+
     }
 
     /**
@@ -80,5 +84,13 @@ public class Utils {
         double durationInSeconds = (audioFileLength / (frameSize * frameRate));
         System.out.println("Audio file length: " + durationInSeconds + " sec");
         return durationInSeconds;
+    }
+
+    public static void writeToFile(String writePath, String text) throws IOException {
+        FileWriter fileWriter = new FileWriter(writePath);
+        // Write the JSON content to the file
+        fileWriter.write(text); // The '2' argument is for indentation
+        fileWriter.flush();
+        fileWriter.close();
     }
 }
