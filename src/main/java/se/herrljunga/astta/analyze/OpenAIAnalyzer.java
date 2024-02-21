@@ -15,6 +15,15 @@ import java.util.stream.Collectors;
 public class OpenAIAnalyzer {
     private OpenAIClient client;
     private String deploymentOrModelId;
+    private int tokensUsed;
+
+    public int getTokensUsed() {
+        return tokensUsed;
+    }
+
+    public void setTokensUsed(int tokensUsed) {
+        this.tokensUsed = tokensUsed;
+    }
 
     public OpenAIAnalyzer(String openAiKey, String openAiEndpoint, String deploymentOrModelId) {
         this.client = new OpenAIClientBuilder()
@@ -51,7 +60,7 @@ public class OpenAIAnalyzer {
             System.out.printf("Usage: number of prompt token is %d, "
                             + "number of completion token is %d, and number of total tokens in request and response is %d.%n",
                     usage.getPromptTokens(), usage.getCompletionTokens(), usage.getTotalTokens());
-
+            setTokensUsed(usage.getTotalTokens());
             return sb.toString();
         } catch (IOException e) {
             throw new RuntimeException(e);

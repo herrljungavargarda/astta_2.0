@@ -105,14 +105,12 @@ public class SpeechToTextImpl implements SpeechToText {
         // Subscribes to events.
         conversationTranscriber.transcribed.addEventListener((s, e) -> {
             if (e.getResult().getReason() == ResultReason.RecognizedSpeech) {
-                System.out.println("TRANSCRIBED: Text=" + e.getResult().getText() + " Speaker ID=" + e.getResult().getSpeakerId());
                 sb.append(e.getResult().getText()).append(" Speaker ID=").append(e.getResult().getSpeakerId()).append("\t");
 
                 if (!languageDetected.get()) { // Check if language detection has been executed
                     AutoDetectSourceLanguageResult autoDetectSourceLanguageResult = AutoDetectSourceLanguageResult.fromResult(e.getResult());
                     String detectedLanguage = autoDetectSourceLanguageResult.getLanguage();
                     transcribedText[1] = detectedLanguage;
-                    System.out.println("Detected language: " + detectedLanguage);
                     languageDetected.set(true); // Set the flag to true to indicate language detection has been executed
                 }
             } else if (e.getResult().getReason() == ResultReason.NoMatch) {

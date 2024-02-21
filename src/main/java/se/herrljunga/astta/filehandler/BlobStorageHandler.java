@@ -104,7 +104,7 @@ public class BlobStorageHandler implements StorageHandler {
      *
      */
     @Override
-    public void saveFile(String filePath) {
+    public void saveToStorage(String filePath) {
         BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(filePath)); // Name of saved file
         if (!blobClient.exists()) {
             System.out.println(":(");
@@ -116,7 +116,7 @@ public class BlobStorageHandler implements StorageHandler {
     }
 
     @Override
-    public void deleteFile(String fileToDeletePath) {
+    public void deleteFromStorage(String fileToDeletePath) {
         BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(fileToDeletePath));
         blobClient.deleteIfExists();
     }

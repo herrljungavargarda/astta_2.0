@@ -1,8 +1,6 @@
 package se.herrljunga.astta;
 
 import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageConfig;
-import se.herrljunga.astta.analyze.Analyze;
-import se.herrljunga.astta.analyze.AnalyzeImpl;
 import se.herrljunga.astta.analyze.OpenAIAnalyzer;
 import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.filehandler.BlobStorageHandler;
@@ -11,8 +9,6 @@ import se.herrljunga.astta.speechtotext.SpeechToTextImpl;
 import se.herrljunga.astta.utils.Config;
 import se.herrljunga.astta.utils.Utils;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -42,24 +38,17 @@ public class App {
 
         try {
             // AI analyzer of text:
+//            List<String[]> results = new ArrayList<>();
+            //String filePath = "src/main/resources/exampleText.txt";
+            //String result = Files.readAllLines(Paths.get(filePath))
+            //        .stream().collect(Collectors.joining(System.lineSeparator()));
 
-            //List<String> paths = testBlobStorage.fetchFile();
-            //List<String[]> result = new ArrayList<>();
-            String filePath = "src/main/resources/exampleText.txt";
-
-
-            String result = Files.readAllLines(Paths.get(filePath))
-                    .stream().collect(Collectors.joining(System.lineSeparator()));
-
-            OpenAIAnalyzer analyzer = new OpenAIAnalyzer(Config.openAiKey, Config.openAiEndpoint, "testGpt4");
-            String analyzedText = analyzer.analyze(result, "sv-SE");
-            System.out.println("Analyzed text: " + analyzedText);
 
             // Remove sensitive data:
-            String jsonFilePath = "src/main/resources/call3.json";
-            Utils.writeToFile(jsonFilePath, analyzedText);
-
-            powerBiBlobStorage.saveFile(jsonFilePath);
+            //String jsonFilePath = "src/main/resources/call3.json";
+            //String s = Utils.createJson(analyzedText, "sv-SE", 123.234, 123);
+            //Utils.writeToFile(jsonFilePath, s);
+            //powerBiBlobStorage.saveToStorage(jsonFilePath);
 
             //Analyze analyze = new AnalyzeImpl(Config.languageKey, Config.languageEndpoint);
             //analyze.removeSensitiveInformation("");
@@ -67,18 +56,16 @@ public class App {
 
             // Transcribe:
 
-            //List<String> paths = testBlobStorage.fetchFile();
-            //List<String[]> result = new ArrayList<>();
-            //for (var path : paths) {
-            //    System.out.println("path " + path);
-            //    String[] transcribedCall = speechToText.speechToText(path);
-            //    result.add(transcribedCall);
-            //}
-            //speechToText.close();
-//
-            //for (var call : result) {
-            //    System.out.println(call);
-            //}
+            OpenAIAnalyzer analyzer = new OpenAIAnalyzer(Config.openAiKey, Config.openAiEndpoint, "testGpt4");
+            List<String> paths = testBlobStorage.fetchFile();
+            for (var audioFile : paths) {
+                String[] transcribedCall = speechToText.speechToText(audioFile);
+                String analyzedText = analyzer.analyze(transcribedCall[0], transcribedCall[1]);
+                String jsonString = Utils.createJson(analyzedText, transcribedCall[1], Utils.getAudioDuration(audioFile), analyzer.getTokensUsed());
+                Utils.writeToFile("src/main/resources/" + Utils.removePathFromFilename(audioFile) + ".json", jsonString);
+                Utils.writeToFile("src/main/temp/" + Utils.removePathFromFilename(audioFile) + ".json", jsonString);
+                powerBiBlobStorage.saveToStorage(Utils.removeWavFromFilename(jsonString));
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());

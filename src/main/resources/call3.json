@@ -1,6 +1,16 @@
 {
-    "Summary": "Användaren upplevde problem med att skriva ut från sin dator till sin HP LaserJet Pro M402dw skrivare. Efter att ha felsökt och uppdaterat drivrutinerna identifierade användaren ett pappersstopp som orsaken till problemet. Efter att ha tagit bort papperet fungerade skrivaren igen.",
-    "Keyword": "printer",
-    "CallerSatisfaction": 9,
-    "NumberOfSpeakers": 2
+  "Summary": "Användaren upplevde prestandaproblem med sin arbetsdator, särskilt när de använder webbläsaren med flera flikar öppna. Helpdesk-agenten föreslog att användaren skulle byta webbläsare för att se om det förbättrar prestandan.",
+  "Keywords": {
+    "MainKeyword": "dator",
+    "SubKeywords": [
+      "långsam",
+      "webbläsaren",
+      "felsökning"
+    ]
+  },
+  "CallerSatisfaction": "8",
+  "NumberOfSpeakers": "2",
+  "Language": "sv-SE",
+  "FileLength": 123.234,
+  "TokensUsed": 123
 }

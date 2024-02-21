@@ -6,7 +6,7 @@ public interface StorageHandler {
     List<byte[]> fetchByte();
     void saveByte(List<byte[]> dataList);
     List<String> fetchFile();
-    void saveFile(String path);
-    void deleteFile(String path);
+    void saveToStorage(String path);
+    void deleteFromStorage(String path);
 
 }
