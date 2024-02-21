@@ -62,9 +62,11 @@ public class App {
                 String[] transcribedCall = speechToText.speechToText(audioFile);
                 String analyzedText = analyzer.analyze(transcribedCall[0], transcribedCall[1]);
                 String jsonString = Utils.createJson(analyzedText, transcribedCall[1], Utils.getAudioDuration(audioFile), analyzer.getTokensUsed());
-                Utils.writeToFile("src/main/resources/" + Utils.removePathFromFilename(audioFile) + ".json", jsonString);
-                Utils.writeToFile("src/main/temp/" + Utils.removePathFromFilename(audioFile) + ".json", jsonString);
-                powerBiBlobStorage.saveToStorage(Utils.removeWavFromFilename(jsonString));
+
+                String fileName = Utils.removeWavFromFilename(Utils.removePathFromFilename(audioFile) + ".json");
+                Utils.writeToFile("src/main/resources/" + fileName, jsonString);
+                Utils.writeToFile("src/main/temp/" + fileName, jsonString);
+                powerBiBlobStorage.saveToStorage(Utils.removeWavFromFilename(audioFile) + ".json"); //src/main/temp/file.json
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,10 +74,5 @@ public class App {
         } finally {
             System.exit(0);
         }
-
-        //stt.speechToText(result.get(0));
-
     }
-
-
 }

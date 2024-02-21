@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 public class OpenAIAnalyzer {
     private OpenAIClient client;
     private String deploymentOrModelId;
-    private int tokensUsed;
+    private String tokensUsed;
 
-    public int getTokensUsed() {
+    public String getTokensUsed() {
         return tokensUsed;
     }
 
-    public void setTokensUsed(int tokensUsed) {
+    public void setTokensUsed(String tokensUsed) {
         this.tokensUsed = tokensUsed;
     }
 
@@ -37,7 +37,6 @@ public class OpenAIAnalyzer {
     public String analyze(String textToAnalyze, String language) {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
         String filePath = "src/main/resources/prompt.txt";
-
         try {
             String mainPrompt = Files.readAllLines(Paths.get(filePath))
                     .stream().collect(Collectors.joining(System.lineSeparator()));
@@ -50,17 +49,13 @@ public class OpenAIAnalyzer {
             StringBuilder sb = new StringBuilder();
             for (ChatChoice choice : chatCompletions.getChoices()) {
                 ChatResponseMessage message = choice.getMessage();
-                //System.out.printf("Index: %d, Chat Role: %s.%n", choice.getIndex(), message.getRole());
-                //System.out.println("Message:");
-                //System.out.println(message.getContent());
                 sb.append(message.getContent()).append("\n");
             }
             CompletionsUsage usage = chatCompletions.getUsage();
 
-            System.out.printf("Usage: number of prompt token is %d, "
-                            + "number of completion token is %d, and number of total tokens in request and response is %d.%n",
-                    usage.getPromptTokens(), usage.getCompletionTokens(), usage.getTotalTokens());
-            setTokensUsed(usage.getTotalTokens());
+            setTokensUsed("Number of prompt token is: " + usage.getPromptTokens() +
+                    " number of completion token is: "+ usage.getCompletionTokens() +
+                    " and number of total tokens in request and response is: " + usage.getTotalTokens());
             return sb.toString();
         } catch (IOException e) {
             throw new RuntimeException(e);

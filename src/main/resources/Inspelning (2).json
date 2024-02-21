@@ -1,0 +1,16 @@
+{
+  "Summary": "Kunden upplever problem med sitt internet och förväntar sig snabb problemlösning trots de föreslagna tekniska begränsningarna.",
+  "Keywords": {
+    "MainKeyword": "internet",
+    "SubKeywords": [
+      "störningar",
+      "kundtjänst",
+      "missnöje"
+    ]
+  },
+  "CallerSatisfaction": "3",
+  "NumberOfSpeakers": "2",
+  "Language": "sv-SE",
+  "FileLength": 95.51042938232422,
+  "TokensUsed": "Number of prompt token is: 745 number of completion token is: 101 and number of total tokens in request and response is: 846"
+}
