@@ -65,6 +65,14 @@ public class Utils {
         return result[result.length - 1];
     }
 
+    // Removes path and filetype
+    public static String getFileName(String path){
+        String[] splitPath = path.split("/");
+        String[] splitFileType = splitPath[splitPath.length-1].split("\\.");
+        return splitFileType[0];
+
+    }
+
     public static String removeWavFromFilename(String name) {
         return name.replace(".wav", "");
     }
@@ -103,5 +111,9 @@ public class Utils {
         fileWriter.write(text); // The '2' argument is for indentation
         fileWriter.flush();
         fileWriter.close();
+    }
+
+    public static void writeToFile(AnalyzedCall analyzedCall) throws IOException {
+        writeToFile(analyzedCall.getSavePath(), analyzedCall.getAnalyzedCallJson());
     }
 }
