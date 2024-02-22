@@ -1,6 +1,10 @@
 package se.herrljunga.astta.utils;
 
 public class TranscribedTextAndLanguage {
+
+    public TranscribedTextAndLanguage() {
+    }
+
     private String transcribedText;
     private String language;
 

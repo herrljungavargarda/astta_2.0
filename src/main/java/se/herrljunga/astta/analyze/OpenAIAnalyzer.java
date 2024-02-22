@@ -20,21 +20,6 @@ import java.util.stream.Collectors;
 public class OpenAIAnalyzer {
     private OpenAIClient client;
     private String deploymentOrModelId;
-    private String tokensUsed;
-
-    /**
-     * Gets the tokens used in the last analysis request.
-     *
-     * @return
-     */
-
-    public String getTokensUsed() {
-        return tokensUsed;
-    }
-
-    public void setTokensUsed(String tokensUsed) {
-        this.tokensUsed = tokensUsed;
-    }
 
     /**
      * Constructs a new OpenAIAnalyzer with the specified API key, endpoint, and deployment or model ID.
@@ -49,23 +34,15 @@ public class OpenAIAnalyzer {
 
     }
 
-    /**
-     * Analyze the given text using the OpenAI API.
-     *
-     * @param textToAnalyze The text to be analyzed.
-     * @param language      The language of the text.
-     * @return The analyzed text.
-     */
-
-    public TranscribedTextAndLanguage analyze(TranscribedTextAndLanguage textToAnalyze) {
+    public AnalyzeResult analyze(TranscribedTextAndLanguage transcribedTextAndLanguage) {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
         String filePath = "src/main/resources/prompt.txt";
         try {
             String mainPrompt = Files.readAllLines(Paths.get(filePath)).stream().collect(Collectors.joining(System.lineSeparator()));
             chatMessages.add(new ChatRequestSystemMessage("CLEAR ALL PREVIOUS CHAT HISTORY AND SESSIONS"));
             chatMessages.add(new ChatRequestSystemMessage(mainPrompt));
-            chatMessages.add(new ChatRequestSystemMessage("Spoken language: " + textToAnalyze.getLanguage()));
-            chatMessages.add(new ChatRequestUserMessage(textToAnalyze.getTranscribedText()));
+            chatMessages.add(new ChatRequestSystemMessage("Spoken language: " + transcribedTextAndLanguage.getLanguage()));
+            chatMessages.add(new ChatRequestUserMessage(transcribedTextAndLanguage.getTranscribedText()));
             ChatCompletions chatCompletions = client.getChatCompletions(deploymentOrModelId, new ChatCompletionsOptions(chatMessages));
 
             StringBuilder sb = new StringBuilder();
@@ -75,8 +52,8 @@ public class OpenAIAnalyzer {
             }
             CompletionsUsage usage = chatCompletions.getUsage();
 
-            setTokensUsed("Number of prompt token is: " + usage.getPromptTokens() + " number of completion token is: " + usage.getCompletionTokens() + " and number of total tokens in request and response is: " + usage.getTotalTokens());
-            
+
+            return new AnalyzeResult(sb.toString(), usage.getTotalTokens());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

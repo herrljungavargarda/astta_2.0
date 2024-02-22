@@ -65,6 +65,14 @@ public class Utils {
         return result[result.length - 1];
     }
 
+    // Removes path and filetype
+    public static String getFileName(String path){
+        String[] splitPath = path.split("/");
+        String[] splitFileType = splitPath[splitPath.length-1].split("\\.");
+        return splitFileType[0];
+
+    }
+
     public static String removeWavFromFilename(String name) {
         return name.replace(".wav", "");
     }
@@ -87,7 +95,7 @@ public class Utils {
         return durationInSeconds;
     }
 
-    public static String createJson(String content, String language, double lengthOfFile, String tokensUsed) {
+    public static String createJson(String content, String language, double lengthOfFile, int tokensUsed) {
         JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
         jsonObject.addProperty("Language", language);
         jsonObject.addProperty("FileLength", lengthOfFile);
@@ -103,5 +111,9 @@ public class Utils {
         fileWriter.write(text); // The '2' argument is for indentation
         fileWriter.flush();
         fileWriter.close();
+    }
+
+    public static void writeToFile(AnalyzedCall analyzedCall) throws IOException {
+        writeToFile(analyzedCall.getSavePath(), analyzedCall.getAnalyzedCallJson());
     }
 }
