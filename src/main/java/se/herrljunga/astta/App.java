@@ -1,6 +1,7 @@
 package se.herrljunga.astta;
 
 import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageConfig;
+import se.herrljunga.astta.analyze.AnalyzeResult;
 import se.herrljunga.astta.analyze.OpenAIAnalyzer;
 import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.filehandler.BlobStorageHandler;
@@ -62,8 +63,8 @@ public class App {
             List<String> paths = testBlobStorage.fetchFile();
             for (var audioFile : paths) {
                 String[] transcribedCall = speechToText.speechToText(audioFile);
-                String analyzedCallResults = analyzer.analyze(transcribedCall[0], transcribedCall[1]);
-                String analyzedCallJson = Utils.createJson(analyzedCallResults, transcribedCall[1], Utils.getAudioDuration(audioFile), analyzer.getTokensUsed());
+                AnalyzeResult analyzedCallResult = analyzer.analyze(transcribedCall[0], transcribedCall[1]);
+                String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall[1], Utils.getAudioDuration(audioFile), analyzedCallResult.tokensUsed());
 
                 String analyzedCallJsonPath = Config.jsonSaveDirectory +    // The json save location folder
                         Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)

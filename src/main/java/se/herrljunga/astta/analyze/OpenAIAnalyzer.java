@@ -15,15 +15,6 @@ import java.util.stream.Collectors;
 public class OpenAIAnalyzer {
     private OpenAIClient client;
     private String deploymentOrModelId;
-    private String tokensUsed;
-
-    public String getTokensUsed() {
-        return tokensUsed;
-    }
-
-    public void setTokensUsed(String tokensUsed) {
-        this.tokensUsed = tokensUsed;
-    }
 
     public OpenAIAnalyzer(String openAiKey, String openAiEndpoint, String deploymentOrModelId) {
         this.client = new OpenAIClientBuilder()
@@ -34,7 +25,7 @@ public class OpenAIAnalyzer {
 
     }
 
-    public String analyze(String textToAnalyze, String language) {
+    public AnalyzeResult analyze(String textToAnalyze, String language) {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
         String filePath = "src/main/resources/prompt.txt";
         try {
@@ -53,10 +44,7 @@ public class OpenAIAnalyzer {
             }
             CompletionsUsage usage = chatCompletions.getUsage();
 
-            setTokensUsed("Number of prompt token is: " + usage.getPromptTokens() +
-                    " number of completion token is: "+ usage.getCompletionTokens() +
-                    " and number of total tokens in request and response is: " + usage.getTotalTokens());
-            return sb.toString();
+            return new AnalyzeResult(sb.toString(), usage.getTotalTokens());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

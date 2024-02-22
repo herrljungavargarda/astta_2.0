@@ -95,7 +95,7 @@ public class Utils {
         return durationInSeconds;
     }
 
-    public static String createJson(String content, String language, double lengthOfFile, String tokensUsed) {
+    public static String createJson(String content, String language, double lengthOfFile, int tokensUsed) {
         JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
         jsonObject.addProperty("Language", language);
         jsonObject.addProperty("FileLength", lengthOfFile);
