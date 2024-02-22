@@ -38,6 +38,9 @@ build/
 ### Mac OS ###
 .DS_Store
 
+# Java
+.class
+
 /src/main/temp
 
 #Ignore config file to not expose secrets

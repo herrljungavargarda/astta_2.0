@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 public class App {
     public static void main(String[] args) {
+
         // Convert audio to text using Azure Speech-to-Text service
         SpeechToText speechToText = new SpeechToTextImpl(
                 Config.speechToTextKey, // Azure Speech service key
@@ -60,13 +61,16 @@ public class App {
             List<String> paths = testBlobStorage.fetchFile();
             for (var audioFile : paths) {
                 String[] transcribedCall = speechToText.speechToText(audioFile);
-                String analyzedText = analyzer.analyze(transcribedCall[0], transcribedCall[1]);
-                String jsonString = Utils.createJson(analyzedText, transcribedCall[1], Utils.getAudioDuration(audioFile), analyzer.getTokensUsed());
+                String analyzedCallResults = analyzer.analyze(transcribedCall[0], transcribedCall[1]);
+                String analyzedCallJson = Utils.createJson(analyzedCallResults, transcribedCall[1], Utils.getAudioDuration(audioFile), analyzer.getTokensUsed());
 
-                String fileName = Utils.removeWavFromFilename(Utils.removePathFromFilename(audioFile) + ".json");
-                Utils.writeToFile("src/main/resources/" + fileName, jsonString);
-                Utils.writeToFile("src/main/temp/" + fileName, jsonString);
-                powerBiBlobStorage.saveToStorage(Utils.removeWavFromFilename(audioFile) + ".json"); //src/main/temp/file.json
+                String analyzedCallSaveDirectory = "src/main/temp/";
+                String analyzedCallJsonPath = analyzedCallSaveDirectory +    // The json save location folder
+                        Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
+                + ".json"; // Make it a json file
+
+                Utils.writeToFile(analyzedCallJsonPath, analyzedCallJson);
+                powerBiBlobStorage.saveToStorage(analyzedCallJsonPath); //src/main/temp/file.json
             }
         } catch (Exception e) {
             e.printStackTrace();
