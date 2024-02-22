@@ -6,6 +6,7 @@ import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.filehandler.BlobStorageHandler;
 import se.herrljunga.astta.speechtotext.SpeechToText;
 import se.herrljunga.astta.speechtotext.SpeechToTextImpl;
+import se.herrljunga.astta.utils.AnalyzedCall;
 import se.herrljunga.astta.utils.Config;
 import se.herrljunga.astta.utils.Utils;
 
@@ -64,13 +65,14 @@ public class App {
                 String analyzedCallResults = analyzer.analyze(transcribedCall[0], transcribedCall[1]);
                 String analyzedCallJson = Utils.createJson(analyzedCallResults, transcribedCall[1], Utils.getAudioDuration(audioFile), analyzer.getTokensUsed());
 
-                String analyzedCallSaveDirectory = "src/main/temp/";
-                String analyzedCallJsonPath = analyzedCallSaveDirectory +    // The json save location folder
+                String analyzedCallJsonPath = Config.jsonSaveDirectory +    // The json save location folder
                         Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
                 + ".json"; // Make it a json file
 
-                Utils.writeToFile(analyzedCallJsonPath, analyzedCallJson);
-                powerBiBlobStorage.saveToStorage(analyzedCallJsonPath); //src/main/temp/file.json
+                AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
+                Utils.writeToFile(analyzedCall);
+
+                //powerBiBlobStorage.saveToStorage(analyzedCallJsonPath); //src/main/temp/file.json
             }
         } catch (Exception e) {
             e.printStackTrace();

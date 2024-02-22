@@ -112,4 +112,8 @@ public class Utils {
         fileWriter.flush();
         fileWriter.close();
     }
+
+    public static void writeToFile(AnalyzedCall analyzedCall) throws IOException {
+        writeToFile(analyzedCall.getSavePath(), analyzedCall.getAnalyzedCallJson());
+    }
 }
