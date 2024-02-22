@@ -7,6 +7,7 @@ import se.herrljunga.astta.filehandler.BlobStorageHandler;
 import se.herrljunga.astta.speechtotext.SpeechToText;
 import se.herrljunga.astta.speechtotext.SpeechToTextImpl;
 import se.herrljunga.astta.utils.Config;
+import se.herrljunga.astta.utils.TranscribedTextAndLanguage;
 import se.herrljunga.astta.utils.Utils;
 
 import java.nio.file.Files;
@@ -59,13 +60,20 @@ public class App {
             OpenAIAnalyzer analyzer = new OpenAIAnalyzer(Config.openAiKey, Config.openAiEndpoint, "testGpt4");
             List<String> paths = testBlobStorage.fetchFile();
             for (var audioFile : paths) {
-                String[] transcribedCall = speechToText.speechToText(audioFile);
-                String analyzedText = analyzer.analyze(transcribedCall[0], transcribedCall[1]);
+                TranscribedTextAndLanguage transcribedCall = speechToText.speechToText(audioFile);
+
+                TranscribedTextAndLanguage result = analyzer.analyze(transcribedCall]);
+                String analyzedText = result.getTranscribedText();
+                String language = result.getLanguage();
+
+                //String analyzedText = analyzer.analyze(transcribedCall[0], transcribedCall[1]);
+
                 String jsonString = Utils.createJson(analyzedText, transcribedCall[1], Utils.getAudioDuration(audioFile), analyzer.getTokensUsed());
 
                 String fileName = Utils.removeWavFromFilename(Utils.removePathFromFilename(audioFile) + ".json");
                 Utils.writeToFile("src/main/resources/" + fileName, jsonString);
                 Utils.writeToFile("src/main/temp/" + fileName, jsonString);
+
                 powerBiBlobStorage.saveToStorage(Utils.removeWavFromFilename(audioFile) + ".json"); //src/main/temp/file.json
             }
         } catch (Exception e) {

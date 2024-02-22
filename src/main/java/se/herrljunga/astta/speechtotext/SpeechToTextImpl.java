@@ -5,9 +5,8 @@ import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
 import com.microsoft.cognitiveservices.speech.audio.AudioInputStream;
 import com.microsoft.cognitiveservices.speech.audio.PushAudioInputStream;
 import com.microsoft.cognitiveservices.speech.transcription.ConversationTranscriber;
+import se.herrljunga.astta.utils.TranscribedTextAndLanguage;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
@@ -94,24 +93,25 @@ public class SpeechToTextImpl implements SpeechToText {
 
 
     @Override
-    public String[] speechToText(String path) throws InterruptedException, ExecutionException {
-        String[] transcribedText = new String[2];
+    public TranscribedTextAndLanguage speechToText(String path) throws InterruptedException, ExecutionException {
+        TranscribedTextAndLanguage transcribedTextAndLanguage = new TranscribedTextAndLanguage();
         sb = new StringBuilder();
         stopRecognitionSemaphore = new Semaphore(0);
         audioConfig = AudioConfig.fromWavFileInput(path);
         conversationTranscriber = new ConversationTranscriber(speechConfig, autoDetectSourceLanguageConfig, audioConfig);
-        AtomicBoolean languageDetected = new AtomicBoolean(false); // Flag to indicate if language detection has been executed
+        AtomicBoolean languageDetected = new AtomicBoolean(false); // Flag to indicate if transcribedTextAndLanguage detection has been executed
 
         // Subscribes to events.
         conversationTranscriber.transcribed.addEventListener((s, e) -> {
             if (e.getResult().getReason() == ResultReason.RecognizedSpeech) {
                 sb.append(e.getResult().getText()).append(" Speaker ID=").append(e.getResult().getSpeakerId()).append("\t");
 
-                if (!languageDetected.get()) { // Check if language detection has been executed
+                if (!languageDetected.get()) { // Check if transcribedTextAndLanguage detection has been executed
                     AutoDetectSourceLanguageResult autoDetectSourceLanguageResult = AutoDetectSourceLanguageResult.fromResult(e.getResult());
                     String detectedLanguage = autoDetectSourceLanguageResult.getLanguage();
-                    transcribedText[1] = detectedLanguage;
-                    languageDetected.set(true); // Set the flag to true to indicate language detection has been executed
+                    transcribedTextAndLanguage.setLanguage(detectedLanguage);
+
+                    languageDetected.set(true); // Set the flag to true to indicate transcribedTextAndLanguage detection has been executed
                 }
             } else if (e.getResult().getReason() == ResultReason.NoMatch) {
                 System.out.println("NOMATCH: Speech could not be transcribed.");
@@ -136,11 +136,12 @@ public class SpeechToTextImpl implements SpeechToText {
         // Waits for completion.
         stopRecognitionSemaphore.acquire();
         conversationTranscriber.stopTranscribingAsync().get();
-        transcribedText[0] = sb.toString();
+
+        transcribedTextAndLanguage.setTranscribedText(sb.toString());
 
 
 
-        return transcribedText;
+        return transcribedTextAndLanguage;
     }
 
     public void close(){
