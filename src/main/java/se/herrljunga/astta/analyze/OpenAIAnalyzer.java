@@ -34,6 +34,13 @@ public class OpenAIAnalyzer {
 
     }
 
+    /**
+     * Analyzes transcribed text and language to generate chat completions and usage statistics.
+     *
+     * @param transcribedTextAndLanguage the transcribed text along with its language
+     * @return an AnalyzeResult object containing chat completions and usage statistics
+     */
+
     public AnalyzeResult analyze(TranscribedTextAndLanguage transcribedTextAndLanguage) {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
         String filePath = "src/main/resources/prompt.txt";
@@ -51,7 +58,6 @@ public class OpenAIAnalyzer {
                 sb.append(message.getContent()).append("\n");
             }
             CompletionsUsage usage = chatCompletions.getUsage();
-
 
             return new AnalyzeResult(sb.toString(), usage.getTotalTokens());
         } catch (IOException e) {

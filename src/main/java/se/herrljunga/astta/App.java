@@ -57,22 +57,39 @@ public class App {
             // Transcribe:
 
             OpenAIAnalyzer analyzer = new OpenAIAnalyzer(Config.openAiKey, Config.openAiEndpoint, "testGpt4");
+            System.out.println("Getting audio files from Blob Storage...");
             List<String> paths = testBlobStorage.fetchFile();
             for (var audioFile : paths) {
+
+                System.out.println("Transcribing: " + audioFile + "...");
                 TranscribedTextAndLanguage transcribedCall = speechToText.speechToText(audioFile);
 
+
+                String transcribedCallSavePath = Config.transcribedTextSaveDirectory +    // src/main/temp
+                        Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
+                        + ".txt"; // Make it a txt file
+                Utils.writeToFile(transcribedCallSavePath, transcribedCall.getTranscribedText());
+
+                System.out.println("Saving transcription to blob...");
+                textformatBlobStorage.saveToStorage(transcribedCallSavePath);
+
+
+                System.out.println("Analyzing: " + audioFile + "...");
                 AnalyzeResult result = analyzer.analyze(transcribedCall);
                 AnalyzeResult analyzedCallResult = analyzer.analyze(transcribedCall);
-                String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getLanguage(), Utils.getAudioDuration(audioFile), analyzedCallResult.tokensUsed());
 
+                System.out.println("Creating json file");
+                String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getLanguage(), Utils.getAudioDuration(audioFile), analyzedCallResult.tokensUsed());
                 String analyzedCallJsonPath = Config.jsonSaveDirectory +    // The json save location folder
                         Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
                         + ".json"; // Make it a json file
-
                 AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
+
+                System.out.println("Saving " + analyzedCallJsonPath + " to blob storage");
                 Utils.writeToFile(analyzedCall);
 
                 //powerBiBlobStorage.saveToStorage(analyzedCallJsonPath); //src/main/temp/file.json
+                System.out.println();
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -119,7 +119,7 @@ public class SpeechToTextImpl implements SpeechToText {
         });
 
         conversationTranscriber.canceled.addEventListener((s, e) -> {
-            System.out.println("CANCELED: Reason=" + e.getReason());
+            System.out.println("Done transcribing: " + e.getReason());
             if (e.getReason() == CancellationReason.Error) {
                 System.out.println("CANCELED: ErrorCode=" + e.getErrorCode());
                 System.out.println("CANCELED: ErrorDetails=" + e.getErrorDetails());
@@ -129,7 +129,7 @@ public class SpeechToTextImpl implements SpeechToText {
         });
 
         conversationTranscriber.sessionStarted.addEventListener((s, e) -> {
-            System.out.println("\n    Session started event.");
+            System.out.println("Starting transcription.");
         });
 
         conversationTranscriber.startTranscribingAsync().get();

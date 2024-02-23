@@ -22,8 +22,8 @@ public class BlobStorageHandler implements StorageHandler {
     /**
      * Constructs a FetchSaveImpl object.
      *
-     * @param endpoint      The endpoint URL of the Azure Blob Storage service.
-     * @param sasToken      The Shared Access Signature (SAS) token for accessing the Blob Storage.
+     * @param endpoint          The endpoint URL of the Azure Blob Storage service.
+     * @param sasToken          The Shared Access Signature (SAS) token for accessing the Blob Storage.
      * @param blobContainerName The name of the Blob Storage container.
      */
     public BlobStorageHandler(String endpoint, String sasToken, String blobContainerName) {
@@ -89,6 +89,7 @@ public class BlobStorageHandler implements StorageHandler {
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             // Retrieve file title
             String blobName = blobItem.getName();
+            System.out.println("Fetching: " + blobName);
             // blobName - Adding the same name as the file in Blob Storage
             BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
             blobClient.downloadToFile(Config.pathToTemp + blobName);
@@ -101,18 +102,18 @@ public class BlobStorageHandler implements StorageHandler {
      * Saves a file to Azure Blob Storage
      *
      * @param filePath The local file path of the file to be saved.
-     *
      */
     @Override
     public void saveToStorage(String filePath) {
         BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(filePath)); // Name of saved file
         if (!blobClient.exists()) {
-            System.out.println(":(");
+            //System.out.println(":(");
         }
         blobClient.uploadFromFile(filePath, true);
         if (blobClient.exists()) {
-            System.out.println(":)");
+            //System.out.println(":)");
         }
+
     }
 
     @Override

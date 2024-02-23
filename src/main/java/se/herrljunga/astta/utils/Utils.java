@@ -52,7 +52,7 @@ public class Utils {
                         return FileVisitResult.CONTINUE;
                     }
                 });
-                System.out.println("Directory and its content deleted successfully.");
+                System.out.println("Temp directory deleted.");
             } catch (IOException e) {
                 System.out.println("Failed to delete directory: " + e.getMessage());
                 e.printStackTrace();
@@ -91,7 +91,7 @@ public class Utils {
         int frameSize = format.getFormat().getFrameSize();
         float frameRate = format.getFormat().getFrameRate();
         double durationInSeconds = (audioFileLength / (frameSize * frameRate));
-        System.out.println("Audio file length: " + durationInSeconds + " sec");
+        //System.out.println("Audio file length: " + durationInSeconds + " sec");
         return durationInSeconds;
     }
 
