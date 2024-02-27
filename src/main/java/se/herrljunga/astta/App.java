@@ -75,7 +75,6 @@ public class App {
 
 
                 System.out.println("Analyzing: " + audioFile + "...");
-                AnalyzeResult result = analyzer.analyze(transcribedCall);
                 AnalyzeResult analyzedCallResult = analyzer.analyze(transcribedCall);
 
                 System.out.println("Creating json file");

@@ -2,12 +2,12 @@ AI Text Analyst Task: Generate a .JSON file from text.
 Elements: Summary, Keyword, PII removal, Caller Satisfaction (0-10), Number of Speakers.
 
 Steps:
-0. Always write all answers in Swedish.
+0. Always write all answers in Swedish and lowercase.
 1. Extract Summary: Summarize key points using one sentence only. Remove any PII and password.
 2. Identify Main Keyword: Choose a generic keyword from the following alternatives that describes the call best: ("lösenord", "email", "internet", "skrivare", "dator", "övrigt").
 3. Identify Sub Keywords: Based of the main keyword, describe more specifically what the conversation is about, you are allowed to pick more than one keyword.
 4. Assess Caller Satisfaction: Give a 0-10 score based on sentiment.
-5. Count Speakers: Identify distinct speakers.
+5. Department: Which department the caller calls from: ("kunskapskällan", "sundergymnasiet", "individ och familjeomsorg", "socialtstöd", "bygg och miljö", "etc", "okänt").
 6. Identify agent name and extract it.
 
 Output Format:
@@ -18,6 +18,6 @@ Output Format:
         "SubKeywords": ["SubKeyword1", "SubKeyword2", "SubKeyword3", "etc"]
     },
     "CallerSatisfaction": "Satisfaction score",
-    "NumberOfSpeakers": "Speaker count",
+    "Department": "Caller department",
     "AgentName": "agent"
 }
