@@ -3,8 +3,9 @@ package se.herrljunga.astta;
 import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageConfig;
 import se.herrljunga.astta.analyze.AnalyzeResult;
 import se.herrljunga.astta.analyze.OpenAIAnalyzer;
-import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.filehandler.BlobStorageHandler;
+import se.herrljunga.astta.filehandler.StorageHandler;
+import se.herrljunga.astta.keyvault.KeyVault;
 import se.herrljunga.astta.speechtotext.SpeechToText;
 import se.herrljunga.astta.speechtotext.SpeechToTextImpl;
 import se.herrljunga.astta.utils.AnalyzedCall;
@@ -20,20 +21,20 @@ public class App {
 
         // Convert audio to text using Azure Speech-to-Text service
         SpeechToText speechToText = new SpeechToTextImpl(
-                Config.speechToTextKey, // Azure Speech service key
+                KeyVault.getSecret("speechtotextkey"), // Azure Speech service key
                 Config.speechToTextRegion, // Azure Speech service region
                 Config.supportedLanguages.get(0), // Base language of the speech
                 AutoDetectSourceLanguageConfig.fromLanguages(Config.supportedLanguages) // In case the base language is wrong
         );
         // Fetch audio files from Azure Blob Storage
-        StorageHandler testBlobStorage = new BlobStorageHandler(Config.blobStorageEndpoint,
-                Config.blobSasToken,
+        StorageHandler audioSourceBlobStorage = new BlobStorageHandler(KeyVault.getSecret("blobstorageendpoint"),
+                KeyVault.getSecret("sastoken"),
                 Config.audioSourceContainerName);
-        StorageHandler textformatBlobStorage = new BlobStorageHandler(Config.blobStorageEndpoint,
-                Config.blobSasToken,
+        StorageHandler textformatBlobStorage = new BlobStorageHandler(KeyVault.getSecret("blobstorageendpoint"),
+                KeyVault.getSecret("sastoken"),
                 Config.textSaveContainerName);
-        StorageHandler powerBiBlobStorage = new BlobStorageHandler(Config.blobStorageEndpoint,
-                Config.blobSasToken,
+        StorageHandler powerBiBlobStorage = new BlobStorageHandler(KeyVault.getSecret("blobstorageendpoint"),
+                KeyVault.getSecret("sastoken"),
                 Config.powerBiContainerName);
 
         try {
@@ -56,9 +57,9 @@ public class App {
 
             // Transcribe:
 
-            OpenAIAnalyzer analyzer = new OpenAIAnalyzer(Config.openAiKey, Config.openAiEndpoint, "testGpt4");
+            OpenAIAnalyzer analyzer = new OpenAIAnalyzer(KeyVault.getSecret("openaikey"), KeyVault.getSecret("openaiendpoint"), "testGpt4");
             System.out.println("Getting audio files from Blob Storage...");
-            List<String> paths = testBlobStorage.fetchFile();
+            List<String> paths = audioSourceBlobStorage.fetchFile();
             for (var audioFile : paths) {
 
                 System.out.println("Transcribing: " + audioFile + "...");
