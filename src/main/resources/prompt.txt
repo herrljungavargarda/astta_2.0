@@ -9,15 +9,14 @@ Steps:
 4. Assess Caller Satisfaction: Give a 0-10 score based on sentiment.
 5. Department: Which department the caller calls from: ("kunskapskällan", "sundergymnasiet", "individ och familjeomsorg", "socialtstöd", "bygg och miljö", "etc", "okänt").
 6. Identify agent name and extract it.
+7. Identify if the issue is solved or not, answer with true(solved) false(unsolved).
 
 Output Format:
 {
-    "Summary": "Concise summary",
-    "Keywords": {
-        "MainKeyword": "Main Keyword",
-        "SubKeywords": ["SubKeyword1", "SubKeyword2", "SubKeyword3", "etc"]
-    },
-    "CallerSatisfaction": "Satisfaction score",
-    "Department": "Caller department",
-    "AgentName": "agent"
+    "Summary": "concise summary",
+    "Keyword": "keyword",
+    "CallerSatisfaction": "satisfaction score",
+    "Department": "caller department",
+    "AgentName": "agent",
+    "IssueSolved": "true/false"
 }

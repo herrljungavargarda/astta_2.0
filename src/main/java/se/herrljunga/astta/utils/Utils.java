@@ -90,9 +90,7 @@ public class Utils {
         long audioFileLength = audioFIle.length();
         int frameSize = format.getFormat().getFrameSize();
         float frameRate = format.getFormat().getFrameRate();
-        double durationInSeconds = (audioFileLength / (frameSize * frameRate));
-        //System.out.println("Audio file length: " + durationInSeconds + " sec");
-        return durationInSeconds;
+        return audioFileLength / (frameSize * frameRate);
     }
 
     public static String createJson(String content, String language, double lengthOfFile, int tokensUsed) {
