@@ -18,46 +18,27 @@ import java.util.List;
 
 public class App {
     public static void main(String[] args) {
-
         // Convert audio to text using Azure Speech-to-Text service
         SpeechToText speechToText = new SpeechToTextImpl(
-                KeyVault.getSecret("speechtotextkey"), // Azure Speech service key
+                KeyVault.getSecret(Config.speechToTextSecretName), // Azure Speech service key
                 Config.speechToTextRegion, // Azure Speech service region
                 Config.supportedLanguages.get(0), // Base language of the speech
                 AutoDetectSourceLanguageConfig.fromLanguages(Config.supportedLanguages) // In case the base language is wrong
         );
         // Fetch audio files from Azure Blob Storage
-        StorageHandler audioSourceBlobStorage = new BlobStorageHandler(KeyVault.getSecret("blobstorageendpoint"),
-                KeyVault.getSecret("sastoken"),
+        StorageHandler audioSourceBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+                KeyVault.getSecret(Config.sasTokenSecretName),
                 Config.audioSourceContainerName);
-        StorageHandler textformatBlobStorage = new BlobStorageHandler(KeyVault.getSecret("blobstorageendpoint"),
-                KeyVault.getSecret("sastoken"),
+        StorageHandler textformatBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+                KeyVault.getSecret(Config.sasTokenSecretName),
                 Config.textSaveContainerName);
-        StorageHandler powerBiBlobStorage = new BlobStorageHandler(KeyVault.getSecret("blobstorageendpoint"),
-                KeyVault.getSecret("sastoken"),
+        StorageHandler powerBiBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+                KeyVault.getSecret(Config.sasTokenSecretName),
                 Config.powerBiContainerName);
 
         try {
-            // AI analyzer of text:
-//            List<String[]> results = new ArrayList<>();
-            //String filePath = "src/main/resources/exampleText.txt";
-            //String result = Files.readAllLines(Paths.get(filePath))
-            //        .stream().collect(Collectors.joining(System.lineSeparator()));
-
-
-            // Remove sensitive data:
-            //String jsonFilePath = "src/main/resources/call3.json";
-            //String s = Utils.createJson(analyzedText, "sv-SE", 123.234, 123);
-            //Utils.writeToFile(jsonFilePath, s);
-            //powerBiBlobStorage.saveToStorage(jsonFilePath);
-
-            //Analyze analyze = new AnalyzeImpl(Config.languageKey, Config.languageEndpoint);
-            //analyze.removeSensitiveInformation("");
-
-
             // Transcribe:
-
-            OpenAIAnalyzer analyzer = new OpenAIAnalyzer(KeyVault.getSecret("openaikey"), KeyVault.getSecret("openaiendpoint"), "testGpt4");
+            OpenAIAnalyzer analyzer = new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel);
             System.out.println("Getting audio files from Blob Storage...");
             List<String> paths = audioSourceBlobStorage.fetchFile();
             for (var audioFile : paths) {

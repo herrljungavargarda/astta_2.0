@@ -106,14 +106,7 @@ public class BlobStorageHandler implements StorageHandler {
     @Override
     public void saveToStorage(String filePath) {
         BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(filePath)); // Name of saved file
-        if (!blobClient.exists()) {
-            //System.out.println(":(");
-        }
         blobClient.uploadFromFile(filePath, true);
-        if (blobClient.exists()) {
-            //System.out.println(":)");
-        }
-
     }
 
     @Override
