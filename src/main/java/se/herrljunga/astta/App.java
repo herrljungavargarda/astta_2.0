@@ -43,7 +43,7 @@ public class App {
             List<String> paths = audioSourceBlobStorage.fetchFile();
             for (var audioFile : paths) {
 
-                if (audioFile.contains("Samtal")) {
+                if (audioFile.contains("testwav")) {
 
                     System.out.println("Transcribing: " + audioFile + "...");
                     TranscribedTextAndLanguage transcribedCall = speechToText.speechToText(audioFile);
