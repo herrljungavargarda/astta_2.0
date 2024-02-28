@@ -36,9 +36,9 @@ public class App {
                 KeyVault.getSecret(Config.sasTokenSecretName),
                 Config.powerBiContainerName);
 
+        OpenAIAnalyzer analyzer = new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel);
         try {
             // Transcribe:
-            OpenAIAnalyzer analyzer = new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel);
             System.out.println("Getting audio files from Blob Storage...");
             List<String> paths = audioSourceBlobStorage.fetchFile();
             for (var audioFile : paths) {
