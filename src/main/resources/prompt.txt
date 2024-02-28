@@ -5,6 +5,7 @@ Information about the call: There will always be dialogue between two speakers. 
 General instructions:
 Always write all answers in swedish and lowercase.
 When identifying and extracting information from the call provide how confident you are in a scale from 0-100%.
+Follow the steps and output in .JSON as shown (Output Format).
 
 Steps:
 1. Extract Summary: Summarize key points using one sentence only. Remove any PII and password.
@@ -16,25 +17,25 @@ Steps:
 
 Output Format:
 {
-   "Summary":"concise summary",
-   "Keyword":{
-      "Keyword":"keyword",
-      "Confidence":"confidence score"
-   },
-   "CallerSatisfaction":{
-      "CallerSatisfaction":"callerSatisfaction score",
-      "Confidence":"confidence score"
-   },
-   "Department":{
-      "Department":"Department",
-      "Confidence":"confidence score"
-   },
-   "IssueSolved":{
-      "IssueSolved":"true/false",
-      "Confidence":"confidence score"
-   },
-   "AgentName":{
-      "AgentName":"agent",
-      "Confidence":"confidence score"
-   }
+  "Summary": "concise summary",
+  "Keyword": {
+    "MainKeyword": "keyword",
+    "Confidence": "confidence score"
+  },
+  "CallerSatisfaction": {
+    "CallerSatisfactionScore": "callerSatisfaction score",
+    "Confidence": "confidence score"
+  },
+  "Department": {
+    "Department": "Department",
+    "Confidence": "confidence score"
+  },
+  "IssueSolved": {
+    "Issue_Solved": "true/false",
+    "Confidence": "confidence score"
+  },
+  "AgentName": {
+    "Name": "agent",
+    "Confidence": "confidence score"
+  }
 }
