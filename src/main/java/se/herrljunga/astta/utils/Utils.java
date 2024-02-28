@@ -94,6 +94,7 @@ public class Utils {
     }
 
     public static String createJson(String content, String language, double lengthOfFile, int tokensUsed) {
+        System.out.println(content);
         JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
         jsonObject.addProperty("Language", language);
         jsonObject.addProperty("FileLength", lengthOfFile);

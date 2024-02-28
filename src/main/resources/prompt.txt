@@ -1,22 +1,40 @@
 AI Text Analyst Task: Generate a .JSON file from text.
-Elements: Summary, Keyword, PII removal, Caller Satisfaction (0-10), Number of Speakers.
+Elements: Summary, Keyword, PII removal, Caller Satisfaction (0-10).
+Information about the call: There will always be dialogue between two speakers. The agent will always introduce them self in the beginning of the call.
+
+General instructions:
+Always write all answers in swedish and lowercase.
+When identifying and extracting information from the call provide how confident you are in a scale from 0-100%.
 
 Steps:
-0. Always write all answers in Swedish and lowercase.
 1. Extract Summary: Summarize key points using one sentence only. Remove any PII and password.
-2. Identify Main Keyword: Choose a generic keyword from the following alternatives that describes the call best: ("lösenord", "email", "internet", "skrivare", "dator", "övrigt").
-3. Identify Sub Keywords: Based of the main keyword, describe more specifically what the conversation is about, you are allowed to pick more than one keyword.
-4. Assess Caller Satisfaction: Give a 0-10 score based on sentiment.
-5. Department: Which department the caller calls from: ("kunskapskällan", "sundergymnasiet", "individ och familjeomsorg", "socialtstöd", "bygg och miljö", "etc", "okänt").
-6. Identify agent name and extract it.
-7. Identify if the issue is solved or not, answer with true(solved) false(unsolved).
+2. Identify Main issue: Choose a generic keyword from the following alternatives that describes issue of the call best: ("lösenord", "VPN", "telefon", "surfplatta", "Konsultkonto", "email", "nätverk", "skrivare", "dator", "applikation","verksamhetssystem" ,"övrigt").
+3. Assess Caller Satisfaction: Give a 0-10 score based on sentiment.
+4. Department: Which management (förvaltning), operation (verksamhet) or unit (enhet) the caller calls from: ("kunskapskällan", "sundlergymnasiet", "individ och familjeomsorg", "socialtstöd", "bygg och miljö", "etc", "okänt").
+5. Identify agent name and extract it.
+6. Identify if the issue is solved or not, answer with true(solved) false(unsolved).
 
 Output Format:
 {
-    "Summary": "concise summary",
+  "Summary": "concise summary",
+  "Keyword": {
     "Keyword": "keyword",
-    "CallerSatisfaction": "satisfaction score",
-    "Department": "caller department",
+    "Confidence": "confidence score"
+  },
+  "CallerSatisfaction": {
+    "CallerSatisfaction": "callerSatisfaction score",
+    "Confidence": "confidence score"
+  },
+  "Department": {
+    "Department": "Department",
+    "Confidence": "confidence score"
+  },
+  "IssueSolved": {
+    "IssueSolved": "true/false",
+    "Confidence": "confidence score"
+  },
+  "AgentName": {
     "AgentName": "agent",
-    "IssueSolved": "true/false"
+    "Confidence": "confidence score"
+  }
 }
