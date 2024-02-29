@@ -5,8 +5,8 @@ for use to transcribe and analyze calls coming to service desk.
 
 ## Before use there are some requirements:
 
-- Azure Speech To Text,
-- Azure OpenAi,
+- Azure Speech To Text
+- Azure OpenAi
 - Blob storage (or any place to store audio/text files)
 - Key vault to store secrets and keys (can be stored in any way you wish)
 
