@@ -24,8 +24,8 @@ for use to transcribe and analyze calls coming to service desk.
 | `Blob SAS token`     | Can be generated when signed in to Azure Portal under Storage account, Shared access signature |
 | `Open AI key`        | Can be found when signed in to Azure Portal under Azure OpenAi, Keys and Endpoint              |
 | `Speech to text key` | Can be found when signed in to Azure Portal under Speech service, Keys and Endpoint            |
-![keyvault](./readmeResources/keyvault.png)
 ------------
+![keyvault](./readmeResources/keyvault.png)
 
 ### Setup key vault authentication on local machine:
 
