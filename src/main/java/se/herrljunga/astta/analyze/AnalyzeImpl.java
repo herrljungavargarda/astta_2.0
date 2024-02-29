@@ -5,15 +5,32 @@ import com.azure.ai.textanalytics.TextAnalyticsClientBuilder;
 import com.azure.ai.textanalytics.models.PiiEntityCollection;
 import com.azure.core.credential.AzureKeyCredential;
 
+/**
+ * Implementation class for erforming text analysis operations.
+ */
+
 public class AnalyzeImpl implements Analyze {
     TextAnalyticsClient client;
 
+    /**
+     * Constructs a new AnalyzeImpl instance with the specified Azure Text Analytics key and endpoint.
+     *
+     * @param key      The Aure Text Analytics API key.
+     * @param endpoint The endpoint for the Azure Text Analytics service.
+     */
     public AnalyzeImpl(String key, String endpoint) {
         client = new TextAnalyticsClientBuilder()
                 .credential(new AzureKeyCredential(key))
                 .endpoint(endpoint)
                 .buildClient();
     }
+
+    /**
+     * Remove sensitive information from the provided text
+     *
+     * @param text The text which can contain sensitive information.
+     * @return The Text with sensitive information removed.
+     */
 
     @Override
     public String removeSensitiveInformation(String text) { // Personnummer i format ex"19450522-1822"

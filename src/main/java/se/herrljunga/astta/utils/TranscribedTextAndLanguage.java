@@ -1,11 +1,17 @@
 package se.herrljunga.astta.utils;
 
+/**
+ * A class representing transcribed text along with its associated language.
+ */
+
 public class TranscribedTextAndLanguage {
+
 
     public TranscribedTextAndLanguage() {
     }
 
     private String transcribedText;
+
     private String language;
 
     public TranscribedTextAndLanguage(String transcribedText, String language) {

@@ -29,37 +29,11 @@ public class BlobStorageHandler implements StorageHandler {
     public BlobStorageHandler(String endpoint, String sasToken, String blobContainerName) {
         this.blobServiceClient = new BlobServiceClientBuilder()
                 .endpoint(endpoint)
-                .sasToken(sasToken) //TODO: Byt ut mot miljövariabel
+                .sasToken(sasToken)
                 .buildClient();
 
         this.blobContainerClient = blobServiceClient.getBlobContainerClient(blobContainerName);
     }
-
-    /**
-     * Fetches audio files from the Blob Storage container.
-     *
-     * @return A list of byte arrays representing the fetched audio files.
-     */
-    @Override
-    public List<byte[]> fetchByte() {
-        List<byte[]> data = new ArrayList<>();
-        for (BlobItem blobItem : blobContainerClient.listBlobs()) {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            // Retrieve file title
-            String blobName = blobItem.getName();
-            BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
-            blobClient.downloadStream(outputStream);
-            data.add(outputStream.toByteArray());
-        }
-        return data;
-    }
-
-    /**
-     * Clears temp directory and deletes it if exists
-     * Create a new temp directory
-     * Fetches all data from blob storage
-     * Saves all files to temp file
-     */
 
 
     /**
@@ -71,7 +45,7 @@ public class BlobStorageHandler implements StorageHandler {
     @Override
     public List<String> fetchFile() {
         List<String> paths = new ArrayList<>();
-        Utils.createTempFile();
+        Utils.createTempDirectory();
         for (BlobItem blobItem : blobContainerClient.listBlobs()) {
             // Retrieve file title
             String blobName = blobItem.getName();
@@ -94,6 +68,11 @@ public class BlobStorageHandler implements StorageHandler {
         BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(filePath)); // Name of saved file
         blobClient.uploadFromFile(filePath, true);
     }
+
+    /**
+     * Deletes specified file from Blob Storage
+     * @param fileToDeletePath The local file path of the file to be deleted
+     */
 
     @Override
     public void deleteFromStorage(String fileToDeletePath) {

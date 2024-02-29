@@ -15,12 +15,14 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 public class Utils {
     /**
-     * Creates a temporary directory to store fetched WAV files.
-     * If the directory already exists, its contents are deleted before creating a new directory.
+     * Creates a temporary directory to store temporary files.
+     * If the directory already exists, its contents and the directory are deleted before creating a new e directory.
      */
-    public static void createTempFile() {
+    public static void createTempDirectory() {
         File path = new File(Config.pathToTemp);
         Path directoryPath = Paths.get(path.getPath());
+
+        // Delete the folder if it exists, we don't want old temp files
         deleteFolderIfExists(path);
 
         try {
@@ -31,9 +33,9 @@ public class Utils {
     }
 
     /**
-     * Deletes a file or directory if it exists.
+     * Deletes file or a directory and its contents.
      *
-     * @param path The file or directory to be deleted.
+     * @param path     The file or directory to be deleted.
      */
 
     public static void deleteFolderIfExists(File path) {
@@ -60,12 +62,25 @@ public class Utils {
         }
     }
 
+
+
+    /**
+     * Remove only the path from an entire path
+     * @param path  the path to remove from the entire file path
+     * @return      the file name with file extension
+     * **/
     public static String removePathFromFilename(String path) { //Remove "src/main/temp/" from file name
         String[] result = path.split("/");
         return result[result.length - 1];
     }
 
-    // Removes path and filetype
+
+
+    /**
+     * Remove path AND filetype, src/main/temp/hej.json" becomes "hej"
+     * @param path  the path of the file
+     * @return      the file name without file extension
+     * **/
     public static String getFileName(String path){
         String[] splitPath = path.split("/");
         String[] splitFileType = splitPath[splitPath.length-1].split("\\.");
@@ -73,46 +88,58 @@ public class Utils {
 
     }
 
-    public static String removeWavFromFilename(String name) {
-        return name.replace(".wav", "");
-    }
-
     /**
      * @param audioFilePath the path to the audio file
-     * @return the duration of the audio file in secounds
+     * @return  the duration of the audio file in seconds
      * @throws UnsupportedAudioFileException if audio file is not supported
      * @throws IOException                   if an I/O error occurs
      */
-
     public static double getAudioDuration(String audioFilePath) throws UnsupportedAudioFileException, IOException {
-        File audioFIle = new File(audioFilePath);
-        AudioFileFormat format = AudioSystem.getAudioFileFormat(audioFIle);
-        long audioFileLength = audioFIle.length();
+        File audioFile = new File(audioFilePath);
+        AudioFileFormat format = AudioSystem.getAudioFileFormat(audioFile);
+
+        long audioFileLength = audioFile.length();
         int frameSize = format.getFormat().getFrameSize();
         float frameRate = format.getFormat().getFrameRate();
         return audioFileLength / (frameSize * frameRate);
     }
 
-    public static String createJson(String content, String language, double lengthOfFile, int tokensUsed) {
-        System.out.println(content);
+
+    /**
+     * Creates a json object and adds language, duration and tokensUsed to the json object
+     * @param content       The "base" content of the json file
+     * @param language      The language of the call
+     * @param duration      The duration of the call
+     * @param tokensUsed    Tokens used in the analyzing process
+     * @return  a json string of a complete json object
+     * **/
+    public static String createJson(String content, String language, double duration, int tokensUsed) {
         JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
         jsonObject.addProperty("Language", language);
-        jsonObject.addProperty("FileLength", lengthOfFile);
+        jsonObject.addProperty("FileLength", duration);
         jsonObject.addProperty("TokensUsed", tokensUsed);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         return gson.toJson(jsonObject);
     }
 
+    /**
+     * @param writePath     the path to write to
+     * @param text          the content of the file
+     * @throws IOException  if there is a problem with writing a file
+     * **/
     public static void writeToFile(String writePath, String text) throws IOException {
-        // Write the JSON content to the file
         FileWriter fileWriter = new FileWriter(writePath);
-        fileWriter.write(text); // The '2' argument is for indentation
+        fileWriter.write(text);
         fileWriter.flush();
         fileWriter.close();
     }
 
+    /**
+     * An overload of writeToFile() for writing analyzed calls to a file
+     * @param analyzedCall  the call to write to the file
+     * **/
     public static void writeToFile(AnalyzedCall analyzedCall) throws IOException {
-        writeToFile(analyzedCall.getSavePath(), analyzedCall.getAnalyzedCallJson());
+        writeToFile(analyzedCall.savePath(), analyzedCall.analyzedCallJson());
     }
 }

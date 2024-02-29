@@ -38,50 +38,6 @@ public class SpeechToTextImpl implements SpeechToText {
     }
 
     /**
-     * Converts speech data represented as a byte array to text. Input one file at a time.
-     *
-     * @param audioFile The audio data to be transcribed, provided as a byte array.
-     * @return The transcribed text.
-     */
-    @Deprecated
-    @Override
-    public String speechToText(byte[] audioFile) {
-        try (PushAudioInputStream pushStream = AudioInputStream.createPushStream();
-            AudioConfig audioConfig = AudioConfig.fromStreamInput(pushStream)) {
-            SpeechRecognizer speechRecognizer = new SpeechRecognizer(speechConfig, autoDetectSourceLanguageConfig, audioConfig);
-            {
-                pushStream.write(audioFile);
-                pushStream.close();
-
-                Future<SpeechRecognitionResult> task = speechRecognizer.recognizeOnceAsync();
-                SpeechRecognitionResult speechRecognitionResult = task.get();
-                if (speechRecognitionResult.getReason() == ResultReason.RecognizedSpeech) {
-                    System.out.println("RECOGNIZED: Text=" + speechRecognitionResult.getText());
-                    speechRecognizer.close();
-                    return speechRecognitionResult.getText();
-                } else if (speechRecognitionResult.getReason() == ResultReason.NoMatch) {
-                    System.out.println("NOMATCH: Speech could not be recognized.");
-                } else if (speechRecognitionResult.getReason() == ResultReason.Canceled) {
-                    CancellationDetails cancellation = CancellationDetails.fromResult(speechRecognitionResult);
-                    System.out.println("CANCELED: Reason=" + cancellation.getReason());
-
-                    if (cancellation.getReason() == CancellationReason.Error) {
-                        System.out.println("CANCELED: ErrorCode=" + cancellation.getErrorCode());
-                        System.out.println("CANCELED: ErrorDetails=" + cancellation.getErrorDetails());
-                        System.out.println("CANCELED: Did you set the speech resource key and region values?");
-                    }
-                }
-
-            }
-            speechRecognizer.close();
-            return "Noting to read";
-
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
      * Transcribes speech from WAV files located at the specified paths.
      * Each WAV file is transcribed individually.
      *
@@ -90,8 +46,6 @@ public class SpeechToTextImpl implements SpeechToText {
      * @throws InterruptedException If the current thread is interrupted while waiting for the transcription to complete.
      * @throws ExecutionException   If an error occurs during the execution of the transcription process.
      */
-
-
     @Override
     public TranscribedTextAndLanguage speechToText(String path) throws InterruptedException, ExecutionException {
         TranscribedTextAndLanguage transcribedTextAndLanguage = new TranscribedTextAndLanguage();
@@ -138,13 +92,17 @@ public class SpeechToTextImpl implements SpeechToText {
         conversationTranscriber.stopTranscribingAsync().get();
 
         transcribedTextAndLanguage.setTranscribedText(sb.toString());
-
-
-
         return transcribedTextAndLanguage;
     }
 
-    public void close(){
+    /**
+     * Closes the resources associated with the SpeechService.
+     * This method releases all the resources used by the SpeechService, including closing the speech configuration, auto-detect source language configuration, audio configuration, and stopping the conversation transcriber.
+     * After calling this method, the SpeechService instance becomes unusable.
+     */
+
+
+    public void close() {
         System.out.println("CLOSING");
         speechConfig.close();
         autoDetectSourceLanguageConfig.close();

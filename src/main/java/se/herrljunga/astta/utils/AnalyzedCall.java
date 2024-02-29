@@ -1,19 +1,9 @@
 package se.herrljunga.astta.utils;
 
-public class AnalyzedCall {
-    private final String savePath;
-    private final String analyzedCallJson;
-
-    public AnalyzedCall(String savePath, String analyzedCallJson) {
-        this.savePath = savePath;
-        this.analyzedCallJson = analyzedCallJson;
-    }
-
-    public String getSavePath() {
-        return savePath;
-    }
-
-    public String getAnalyzedCallJson() {
-        return analyzedCallJson;
-    }
+/**
+ * A record to save analyzed calls
+ * @param savePath The path to save the json file to
+ * @param analyzedCallJson The analyzed call in the form of a json string
+ * **/
+public record AnalyzedCall(String savePath, String analyzedCallJson) {
 }
