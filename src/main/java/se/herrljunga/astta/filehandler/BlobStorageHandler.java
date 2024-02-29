@@ -54,20 +54,6 @@ public class BlobStorageHandler implements StorageHandler {
         return data;
     }
 
-    @Override
-    public void saveByte(List<byte[]> dataList) {
-        //TODO: Behöver kollas över innan impl
-//        for (int i = 0; i < dataList.size(); i++) {
-//            byte[] data = dataList.get(i);
-//            File outputFile = new File("output" + i + ".wav");
-//            try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-//                fos.write(data);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-    }
-
     /**
      * Clears temp directory and deletes it if exists
      * Create a new temp directory
