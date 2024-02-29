@@ -1,6 +1,6 @@
 # Azure-Speech-To-Text-Analysis
 
-This project is made by three students developers from YRGO on behalf on Herrljunga and Vårgårda municipality,
+This project is made by three students developers from YRGO on behalf of Herrljunga and Vårgårda municipality,
 for use to transcribe and analyze calls coming to service desk.
 
 ## Before use there are some requirements:
