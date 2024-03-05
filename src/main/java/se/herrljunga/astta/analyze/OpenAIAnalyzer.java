@@ -65,7 +65,7 @@ public class OpenAIAnalyzer {
             return new AnalyzeResult(sb.toString(), usage.getTotalTokens());
         } catch (IOException e) {
             System.err.println("An error reading prompt.txt: " + e.getMessage());
-            throw new RuntimeException(e);
+            throw new RuntimeException("Exception thrown in OpenAiAnalyzer, analyze " + e.getMessage());
         }
     }
 }
