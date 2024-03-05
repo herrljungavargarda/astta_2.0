@@ -47,52 +47,58 @@ public class SpeechToTextImpl implements SpeechToText {
      * @throws ExecutionException   If an error occurs during the execution of the transcription process.
      */
     @Override
-    public TranscribedTextAndLanguage speechToText(String path) throws InterruptedException, ExecutionException {
-        TranscribedTextAndLanguage transcribedTextAndLanguage = new TranscribedTextAndLanguage();
-        sb = new StringBuilder();
-        stopRecognitionSemaphore = new Semaphore(0);
-        audioConfig = AudioConfig.fromWavFileInput(path);
-        conversationTranscriber = new ConversationTranscriber(speechConfig, autoDetectSourceLanguageConfig, audioConfig);
-        AtomicBoolean languageDetected = new AtomicBoolean(false); // Flag to indicate if transcribedTextAndLanguage detection has been executed
+    public TranscribedTextAndLanguage speechToText(String path) {
+        try {
+            TranscribedTextAndLanguage transcribedTextAndLanguage = new TranscribedTextAndLanguage();
+            sb = new StringBuilder();
+            stopRecognitionSemaphore = new Semaphore(0);
+            audioConfig = AudioConfig.fromWavFileInput(path);
+            conversationTranscriber = new ConversationTranscriber(speechConfig, autoDetectSourceLanguageConfig, audioConfig);
+            AtomicBoolean languageDetected = new AtomicBoolean(false); // Flag to indicate if transcribedTextAndLanguage detection has been executed
 
-        // Subscribes to events.
-        conversationTranscriber.transcribed.addEventListener((s, e) -> {
-            if (e.getResult().getReason() == ResultReason.RecognizedSpeech) {
-                sb.append(e.getResult().getText()).append(" Speaker ID=").append(e.getResult().getSpeakerId()).append("\t");
+            // Subscribes to events.
+            conversationTranscriber.transcribed.addEventListener((s, e) -> {
+                if (e.getResult().getReason() == ResultReason.RecognizedSpeech) {
+                    sb.append(e.getResult().getText()).append(" Speaker ID=").append(e.getResult().getSpeakerId()).append("\t");
 
-                if (!languageDetected.get()) { // Check if transcribedTextAndLanguage detection has been executed
-                    AutoDetectSourceLanguageResult autoDetectSourceLanguageResult = AutoDetectSourceLanguageResult.fromResult(e.getResult());
-                    String detectedLanguage = autoDetectSourceLanguageResult.getLanguage();
-                    transcribedTextAndLanguage.setLanguage(detectedLanguage);
+                    if (!languageDetected.get()) { // Check if transcribedTextAndLanguage detection has been executed
+                        AutoDetectSourceLanguageResult autoDetectSourceLanguageResult = AutoDetectSourceLanguageResult.fromResult(e.getResult());
+                        String detectedLanguage = autoDetectSourceLanguageResult.getLanguage();
+                        transcribedTextAndLanguage.setLanguage(detectedLanguage);
 
-                    languageDetected.set(true); // Set the flag to true to indicate transcribedTextAndLanguage detection has been executed
+                        languageDetected.set(true); // Set the flag to true to indicate transcribedTextAndLanguage detection has been executed
+                    }
+                } else if (e.getResult().getReason() == ResultReason.NoMatch) {
+                    System.out.println("NOMATCH: Speech could not be transcribed.");
                 }
-            } else if (e.getResult().getReason() == ResultReason.NoMatch) {
-                System.out.println("NOMATCH: Speech could not be transcribed.");
-            }
-        });
+            });
 
-        conversationTranscriber.canceled.addEventListener((s, e) -> {
-            System.out.println("Done transcribing: " + e.getReason());
-            if (e.getReason() == CancellationReason.Error) {
-                System.out.println("CANCELED: ErrorCode=" + e.getErrorCode());
-                System.out.println("CANCELED: ErrorDetails=" + e.getErrorDetails());
-                System.out.println("CANCELED: Did you update the subscription info?");
-            }
-            stopRecognitionSemaphore.release();
-        });
+            conversationTranscriber.canceled.addEventListener((s, e) -> {
+                System.out.println("Done transcribing: " + e.getReason());
+                if (e.getReason() == CancellationReason.Error) {
+                    System.out.println("CANCELED: ErrorCode=" + e.getErrorCode());
+                    System.out.println("CANCELED: ErrorDetails=" + e.getErrorDetails());
+                    System.out.println("CANCELED: Did you update the subscription info?");
+                }
+                stopRecognitionSemaphore.release();
+            });
 
-        conversationTranscriber.sessionStarted.addEventListener((s, e) -> {
-            System.out.println("Starting transcription.");
-        });
+            conversationTranscriber.sessionStarted.addEventListener((s, e) -> {
+                System.out.println("Starting transcription.");
+            });
 
-        conversationTranscriber.startTranscribingAsync().get();
-        // Waits for completion.
-        stopRecognitionSemaphore.acquire();
-        conversationTranscriber.stopTranscribingAsync().get();
+            conversationTranscriber.startTranscribingAsync().get();
+            // Waits for completion.
+            stopRecognitionSemaphore.acquire();
+            conversationTranscriber.stopTranscribingAsync().get();
 
-        transcribedTextAndLanguage.setTranscribedText(sb.toString());
-        return transcribedTextAndLanguage;
+            transcribedTextAndLanguage.setTranscribedText(sb.toString());
+            return transcribedTextAndLanguage;
+        }
+        catch (InterruptedException | ExecutionException e) {
+            System.err.println("An error occurred when transcribing audio file");
+            throw new RuntimeException("Exception thrown in SpeechToTextImpl, speechToText " + e.getMessage());
+        }
     }
 
     /**

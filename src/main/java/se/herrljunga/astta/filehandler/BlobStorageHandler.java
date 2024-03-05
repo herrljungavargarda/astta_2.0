@@ -4,11 +4,16 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.implementation.models.StorageErrorException;
 import com.azure.storage.blob.models.BlobItem;
+import com.azure.storage.blob.models.BlobStorageException;
 import se.herrljunga.astta.utils.Config;
 import se.herrljunga.astta.utils.Utils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,18 +49,23 @@ public class BlobStorageHandler implements StorageHandler {
      */
     @Override
     public List<String> fetchFile() {
-        List<String> paths = new ArrayList<>();
-        Utils.createTempDirectory();
-        for (BlobItem blobItem : blobContainerClient.listBlobs()) {
-            // Retrieve file title
-            String blobName = blobItem.getName();
-            System.out.println("Fetching: " + blobName);
-            // blobName - Adding the same name as the file in Blob Storage
-            BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
-            blobClient.downloadToFile(Config.pathToTemp + blobName);
-            paths.add(Config.pathToTemp + blobName);
+        try {
+            List<String> paths = new ArrayList<>();
+            Utils.createTempDirectory();
+            for (BlobItem blobItem : blobContainerClient.listBlobs()) {
+                // Retrieve file title
+                String blobName = blobItem.getName();
+                System.out.println("Fetching: " + blobName);
+                // blobName - Adding the same name as the file in Blob Storage
+                BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
+                blobClient.downloadToFile(Config.pathToTemp + blobName);
+                paths.add(Config.pathToTemp + blobName);
+            }
+            return paths;
+        } catch (BlobStorageException | StorageErrorException e) {
+            System.err.println("An error fetching files from blob");
+            throw new RuntimeException("Exception thrown in BlobStorageHandler, fetchFile " + e.getMessage());
         }
-        return paths;
     }
 
     /**
@@ -65,19 +75,31 @@ public class BlobStorageHandler implements StorageHandler {
      */
     @Override
     public void saveToStorage(String filePath) {
-        BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(filePath)); // Name of saved file
-        blobClient.uploadFromFile(filePath, true);
+        try {
+            BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(filePath)); // Name of saved file
+            blobClient.uploadFromFile(filePath, true);
+        } catch (BlobStorageException | StorageErrorException e) {
+            System.err.println("An error saving files to blob");
+            throw new RuntimeException("Exception thrown in BlobStorageHandler, saveToStorage " + e.getMessage());
+        }
     }
 
     /**
      * Deletes specified file from Blob Storage
+     *
      * @param fileToDeletePath The local file path of the file to be deleted
      */
 
     @Override
     public void deleteFromStorage(String fileToDeletePath) {
-        BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(fileToDeletePath));
-        blobClient.deleteIfExists();
+        try {
+            BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(fileToDeletePath));
+            blobClient.deleteIfExists();
+        }
+        catch (BlobStorageException | StorageErrorException e) {
+            System.err.println("An error deleting files from blob");
+            throw new RuntimeException("Exception thrown in BlobStorageHandler, deleteFromStorage " + e.getMessage());
+        }
     }
 
 }
