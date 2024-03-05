@@ -5,6 +5,8 @@ import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
 import com.microsoft.cognitiveservices.speech.audio.AudioInputStream;
 import com.microsoft.cognitiveservices.speech.audio.PushAudioInputStream;
 import com.microsoft.cognitiveservices.speech.transcription.ConversationTranscriber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.herrljunga.astta.utils.TranscribedTextAndLanguage;
 
 import java.util.concurrent.ExecutionException;
@@ -17,9 +19,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class SpeechToTextImpl implements SpeechToText {
     SpeechConfig speechConfig;
+    private Logger logger = LoggerFactory.getLogger(SpeechToTextImpl.class);
     AutoDetectSourceLanguageConfig autoDetectSourceLanguageConfig;
     AudioConfig audioConfig;
-
     ConversationTranscriber conversationTranscriber;
     Semaphore stopRecognitionSemaphore;
     StringBuilder sb;
@@ -48,6 +50,7 @@ public class SpeechToTextImpl implements SpeechToText {
      */
     @Override
     public TranscribedTextAndLanguage speechToText(String path) {
+        logger.info("Starting speech to text conversion for file at path: " + path);
         try {
             TranscribedTextAndLanguage transcribedTextAndLanguage = new TranscribedTextAndLanguage();
             sb = new StringBuilder();
@@ -69,22 +72,22 @@ public class SpeechToTextImpl implements SpeechToText {
                         languageDetected.set(true); // Set the flag to true to indicate transcribedTextAndLanguage detection has been executed
                     }
                 } else if (e.getResult().getReason() == ResultReason.NoMatch) {
-                    System.out.println("NOMATCH: Speech could not be transcribed.");
+                    logger.info("NOMATCH: Speech could not be transcribed.");
                 }
             });
 
             conversationTranscriber.canceled.addEventListener((s, e) -> {
-                System.out.println("Done transcribing: " + e.getReason());
+                logger.info("Done transcribing: " + e.getReason());
                 if (e.getReason() == CancellationReason.Error) {
-                    System.out.println("CANCELED: ErrorCode=" + e.getErrorCode());
-                    System.out.println("CANCELED: ErrorDetails=" + e.getErrorDetails());
-                    System.out.println("CANCELED: Did you update the subscription info?");
+                    logger.info("CANCELED: ErrorCode=" + e.getErrorCode());
+                    logger.info("CANCELED: ErrorDetails=" + e.getErrorDetails());
+                    logger.info("CANCELED: Did you update the subscription info?");
                 }
                 stopRecognitionSemaphore.release();
             });
 
             conversationTranscriber.sessionStarted.addEventListener((s, e) -> {
-                System.out.println("Starting transcription.");
+                logger.info("Starting transcription.");
             });
 
             conversationTranscriber.startTranscribingAsync().get();
@@ -93,10 +96,12 @@ public class SpeechToTextImpl implements SpeechToText {
             conversationTranscriber.stopTranscribingAsync().get();
 
             transcribedTextAndLanguage.setTranscribedText(sb.toString());
+
+            logger.info("Completed speech to text conversion for file at path: " + path);
             return transcribedTextAndLanguage;
         }
         catch (InterruptedException | ExecutionException e) {
-            System.err.println("An error occurred when transcribing audio file");
+            logger.error("An error occurred when transcribing audio file" + e);
             throw new RuntimeException("Exception thrown in SpeechToTextImpl, speechToText " + e.getMessage());
         }
     }
@@ -109,7 +114,7 @@ public class SpeechToTextImpl implements SpeechToText {
 
 
     public void close() {
-        System.out.println("CLOSING");
+        logger.info("Closing all active resources");
         speechConfig.close();
         autoDetectSourceLanguageConfig.close();
         audioConfig.close();

@@ -1,6 +1,8 @@
 package se.herrljunga.astta.utils;
 
 import com.google.gson.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioSystem;
@@ -12,6 +14,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
 public class Utils {
+    private static Logger logger = LoggerFactory.getLogger(Utils.class);
     /**
      * Creates a temporary directory to store temporary files.
      * If the directory already exists, its contents and the directory are deleted before creating a new e directory.
@@ -24,9 +27,11 @@ public class Utils {
         deleteFolderIfExists(path);
 
         try {
+            logger.info("Creating temp directory");
             Files.createDirectory(directoryPath);
+            logger.info("Done creating temp directory");
         } catch (IOException ex) {
-            System.err.println("An error occurred when trying to create directory.");
+            logger.info("An error occurred when trying to create directory.");
             throw new RuntimeException("Exception thrown in Utils, createTempDirectory " + ex.getMessage());
         }
     }
@@ -38,6 +43,7 @@ public class Utils {
      */
 
     public static void deleteFolderIfExists(File path) {
+        logger.info("Deleting temp directory if it exists.");
         if (path.exists()) {
             try {
                 Files.walkFileTree(path.toPath(), new SimpleFileVisitor<Path>() {
@@ -53,9 +59,9 @@ public class Utils {
                         return FileVisitResult.CONTINUE;
                     }
                 });
-                System.out.println("Temp directory deleted.");
+                logger.info("Temp directory deleted.");
             } catch (IOException e) {
-                System.err.println("An error occurred when trying to delete directory.");
+                logger.error("An error occurred when trying to delete directory." + e);
                 throw new RuntimeException("Exception thrown in Utils, deleteFolderIfExists " + e.getMessage());
             }
         }
@@ -94,15 +100,17 @@ public class Utils {
      */
     public static double getAudioDuration(String audioFilePath) {
         try {
+            logger.info("Calculating audio file duration.");
             File audioFile = new File(audioFilePath);
             AudioFileFormat format = AudioSystem.getAudioFileFormat(audioFile);
 
             long audioFileLength = audioFile.length();
             int frameSize = format.getFormat().getFrameSize();
             float frameRate = format.getFormat().getFrameRate();
+            logger.info("Done calculating audio file duration: " + audioFileLength / (frameSize * frameRate));
             return audioFileLength / (frameSize * frameRate);
         } catch (UnsupportedAudioFileException | IOException e) {
-            System.err.println("An error occurred when trying to get audio file duration.");
+            logger.error("An error occurred when trying to get audio file duration." + e);
             throw new RuntimeException("Exception thrown in Utils, getAudioDuration " + e.getMessage());
         }
     }
@@ -118,16 +126,17 @@ public class Utils {
      * @return a json string of a complete json object
      **/
     public static String createJson(String content, String language, double duration, int tokensUsed) {
+        logger.info("Creating and parsing json");
         try {
             JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
             jsonObject.addProperty("Language", language);
             jsonObject.addProperty("FileLength", duration);
             jsonObject.addProperty("TokensUsed", tokensUsed);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
+            logger.info("Done creating and parsing json");
             return gson.toJson(jsonObject);
         } catch (JsonParseException e) {
-            System.err.println("An error occurred when trying to parse Json.");
+            logger.error("An error occurred when trying to parse Json." + e);
             throw new RuntimeException("Exception thrown in Utils, createJson " + e.getMessage());
         }
     }
@@ -137,13 +146,15 @@ public class Utils {
      * @param text      the content of the file
      **/
     public static void writeToFile(String writePath, String text) {
+        logger.info("Writing to file: " + writePath);
         try {
             FileWriter fileWriter = new FileWriter(writePath);
             fileWriter.write(text);
             fileWriter.flush();
             fileWriter.close();
+            logger.info("Done writing to file: " + writePath);
         } catch (IOException e) {
-            System.err.println("An error occurred when trying to write to file.");
+            logger.error("An error occurred when trying to write to file." + e);
             throw new RuntimeException("Exception thrown in Utils, writeToFile " + e.getMessage());
         }
     }

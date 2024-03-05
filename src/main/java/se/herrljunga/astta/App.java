@@ -1,6 +1,8 @@
 package se.herrljunga.astta;
 
 import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageConfig;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.herrljunga.astta.analyze.AnalyzeResult;
@@ -83,7 +85,8 @@ public class App {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(e.getMessage());
+
+            logger.error("Exception occured: ", e);
         } finally {
             System.exit(0);
         }

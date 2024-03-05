@@ -7,10 +7,13 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.implementation.models.StorageErrorException;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobStorageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.herrljunga.astta.utils.Config;
 import se.herrljunga.astta.utils.Utils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
@@ -23,6 +26,8 @@ import java.util.List;
 public class BlobStorageHandler implements StorageHandler {
     BlobServiceClient blobServiceClient;
     BlobContainerClient blobContainerClient;
+
+    Logger logger = LoggerFactory.getLogger(BlobStorageHandler.class);
 
     /**
      * Constructs a FetchSaveImpl object.
@@ -49,18 +54,21 @@ public class BlobStorageHandler implements StorageHandler {
      */
     @Override
     public List<String> fetchFile() {
+        logger.info("Fetching files");
         try {
             List<String> paths = new ArrayList<>();
             Utils.createTempDirectory();
             for (BlobItem blobItem : blobContainerClient.listBlobs()) {
                 // Retrieve file title
                 String blobName = blobItem.getName();
-                System.out.println("Fetching: " + blobName);
+                logger.info("Fetching file: " + blobName);
                 // blobName - Adding the same name as the file in Blob Storage
                 BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
                 blobClient.downloadToFile(Config.pathToTemp + blobName);
                 paths.add(Config.pathToTemp + blobName);
             }
+            logger.info("Done fetching files");
+
             return paths;
         } catch (BlobStorageException | StorageErrorException e) {
             System.err.println("An error fetching files from blob");
@@ -75,6 +83,7 @@ public class BlobStorageHandler implements StorageHandler {
      */
     @Override
     public void saveToStorage(String filePath) {
+        logger.info("Saving to storage: " + filePath);
         try {
             BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(filePath)); // Name of saved file
             blobClient.uploadFromFile(filePath, true);
@@ -82,6 +91,7 @@ public class BlobStorageHandler implements StorageHandler {
             System.err.println("An error saving files to blob");
             throw new RuntimeException("Exception thrown in BlobStorageHandler, saveToStorage " + e.getMessage());
         }
+        logger.info("Done saving to storage: " + filePath);
     }
 
     /**
@@ -92,6 +102,7 @@ public class BlobStorageHandler implements StorageHandler {
 
     @Override
     public void deleteFromStorage(String fileToDeletePath) {
+        logger.info("Deleting file from storage: " + fileToDeletePath);
         try {
             BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(fileToDeletePath));
             blobClient.deleteIfExists();
@@ -100,6 +111,7 @@ public class BlobStorageHandler implements StorageHandler {
             System.err.println("An error deleting files from blob");
             throw new RuntimeException("Exception thrown in BlobStorageHandler, deleteFromStorage " + e.getMessage());
         }
+        logger.info("Done deleting from storage: " + fileToDeletePath);
     }
 
 }
