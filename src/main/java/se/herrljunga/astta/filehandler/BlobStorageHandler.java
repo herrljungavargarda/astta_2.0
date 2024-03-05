@@ -108,7 +108,7 @@ public class BlobStorageHandler implements StorageHandler {
             blobClient.deleteIfExists();
         }
         catch (BlobStorageException | StorageErrorException e) {
-            System.err.println("An error deleting files from blob");
+            logger.info("Error deleting files from blob: ", e);
             throw new RuntimeException("Exception thrown in BlobStorageHandler, deleteFromStorage " + e.getMessage());
         }
         logger.info("Done deleting from storage: " + fileToDeletePath);

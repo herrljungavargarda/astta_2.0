@@ -16,6 +16,8 @@ for use to transcribe and analyze calls coming to service desk.
 
 - Set up necessary keys and refer to them in Utils/Config (if using key vault, refer to the name you set)
 - Set up Ai model, can be found and set up when signed in to Azure Portal under Azure OpenAi, Model deployments
+- To change the output format or add/remove anything you can edit the main prompt.
+  We would recommend to follow the prompt style used.
 
 ### Key vault setup
 
