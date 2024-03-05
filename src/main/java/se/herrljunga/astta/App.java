@@ -1,6 +1,8 @@
 package se.herrljunga.astta;
 
 import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageConfig;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.herrljunga.astta.analyze.AnalyzeResult;
@@ -23,6 +25,9 @@ public class App {
 
         Logger logger = LoggerFactory.getLogger(App.class);
         logger.debug("Starting logger");
+
+        logger.info("hej");
+        logger.error("nej");
 
         // Convert audio to text using Azure Speech-to-Text service
         SpeechToText speechToText = new SpeechToTextImpl(
