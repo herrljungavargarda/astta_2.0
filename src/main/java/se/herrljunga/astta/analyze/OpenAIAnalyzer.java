@@ -4,6 +4,8 @@ import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.ai.openai.models.*;
 import com.azure.core.credential.AzureKeyCredential;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.herrljunga.astta.utils.TranscribedTextAndLanguage;
 
 import java.io.IOException;
@@ -16,10 +18,10 @@ import java.util.stream.Collectors;
 /**
  * The OpenAIAnalyzer class provides functionality to analyze text using the OpenAI API.
  */
-
 public class OpenAIAnalyzer {
     private OpenAIClient client;
     private String deploymentOrModelId;
+    private Logger logger = LoggerFactory.getLogger(OpenAIAnalyzer.class);
 
     /**
      * Constructs a new OpenAIAnalyzer with the specified API key, endpoint, and deployment or model ID.
@@ -31,7 +33,7 @@ public class OpenAIAnalyzer {
     public OpenAIAnalyzer(String openAiKey, String openAiEndpoint, String deploymentOrModelId) {
         this.client = new OpenAIClientBuilder().credential(new AzureKeyCredential(openAiKey)).endpoint(openAiEndpoint).buildClient();
         this.deploymentOrModelId = deploymentOrModelId;
-
+        logger.info("OpenAIAnalyzer initialized with deployment/model ID: " + deploymentOrModelId);
     }
 
     /**
@@ -43,11 +45,11 @@ public class OpenAIAnalyzer {
      * If you wish to change the output format or add/remove anything you can edit that file.
      * We would recommend to follow the prompt style used.
      */
-
     public AnalyzeResult analyze(TranscribedTextAndLanguage transcribedTextAndLanguage) {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
         String filePath = "src/main/resources/prompt.txt";
         try {
+            logger.info("Starting analysis for transcribed text and language: " + transcribedTextAndLanguage);
             String mainPrompt = Files.readAllLines(Paths.get(filePath)).stream().collect(Collectors.joining(System.lineSeparator()));
             chatMessages.add(new ChatRequestSystemMessage("Before continuing, REMOVE OLD CACHE."));
             chatMessages.add(new ChatRequestSystemMessage(mainPrompt));
@@ -62,9 +64,10 @@ public class OpenAIAnalyzer {
             }
             CompletionsUsage usage = chatCompletions.getUsage();
 
+            logger.info("Analysis completed successfully. Total tokens used: " + usage.getTotalTokens());
             return new AnalyzeResult(sb.toString(), usage.getTotalTokens());
         } catch (IOException e) {
-            System.err.println("An error reading prompt.txt: " + e.getMessage());
+            logger.error("An error occurred when reading prompt.txt: " + e.getMessage());
             throw new RuntimeException("Exception thrown in OpenAiAnalyzer, analyze " + e.getMessage());
         }
     }

@@ -26,9 +26,6 @@ public class App {
         Logger logger = LoggerFactory.getLogger(App.class);
         logger.debug("Starting logger");
 
-        logger.info("hej");
-        logger.error("nej");
-
         // Convert audio to text using Azure Speech-to-Text service
         SpeechToText speechToText = new SpeechToTextImpl(
                 KeyVault.getSecret(Config.speechToTextSecretName), // Azure Speech service key
@@ -88,7 +85,8 @@ public class App {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(e.getMessage());
+
+            logger.error("Exception occured: ", e);
         } finally {
             System.exit(0);
         }
