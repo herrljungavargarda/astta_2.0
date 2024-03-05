@@ -1,6 +1,8 @@
 package se.herrljunga.astta;
 
 import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.herrljunga.astta.analyze.AnalyzeResult;
 import se.herrljunga.astta.analyze.OpenAIAnalyzer;
 import se.herrljunga.astta.filehandler.BlobStorageHandler;
@@ -18,6 +20,10 @@ import java.util.List;
 
 public class App {
     public static void main(String[] args) {
+
+        Logger logger = LoggerFactory.getLogger(App.class);
+        logger.debug("Starting logger");
+
         // Convert audio to text using Azure Speech-to-Text service
         SpeechToText speechToText = new SpeechToTextImpl(
                 KeyVault.getSecret(Config.speechToTextSecretName), // Azure Speech service key
