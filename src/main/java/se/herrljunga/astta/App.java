@@ -47,13 +47,16 @@ public class App {
         OpenAIAnalyzer analyzer = new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel);
         try {
             // Transcribe:
-            System.out.println("Getting audio files from Blob Storage...");
             List<String> paths = audioSourceBlobStorage.fetchFile();
             for (var audioFile : paths) {
 
+<<<<<<< HEAD
                 if (audioFile.contains("onmicrosoft.com")) {
 
                     System.out.println("Transcribing: " + audioFile + "...");
+=======
+                if (audioFile.contains("testwav")) {
+>>>>>>> 30e7fe9a96406fe069394250b103b3f01995e3fc
                     TranscribedTextAndLanguage transcribedCall = speechToText.speechToText(audioFile);
 
 
@@ -62,25 +65,19 @@ public class App {
                             + ".txt"; // Make it a txt file
                     Utils.writeToFile(transcribedCallSavePath, transcribedCall.getTranscribedText());
 
-                    System.out.println("Saving transcription to blob...");
                     textformatBlobStorage.saveToStorage(transcribedCallSavePath);
 
 
-                    System.out.println("Analyzing: " + audioFile + "...");
                     AnalyzeResult analyzedCallResult = analyzer.analyze(transcribedCall);
 
-                    System.out.println("Creating json file");
                     String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getLanguage(), Utils.getAudioDuration(audioFile), analyzedCallResult.tokensUsed());
                     String analyzedCallJsonPath = Config.jsonSaveDirectory +    // The json save location folder
                             Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
                             + ".json"; // Make it a json file
                     AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
-
-                    System.out.println("Saving " + analyzedCallJsonPath + " to blob storage");
                     Utils.writeToFile(analyzedCall);
 
                     //powerBiBlobStorage.saveToStorage(analyzedCallJsonPath); //src/main/temp/file.json
-                    System.out.println();
                 }
             }
         } catch (Exception e) {
