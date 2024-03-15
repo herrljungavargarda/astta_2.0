@@ -17,6 +17,7 @@ import se.herrljunga.astta.utils.Config;
 import se.herrljunga.astta.utils.TranscribedTextAndLanguage;
 import se.herrljunga.astta.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -41,41 +42,70 @@ public class App {
                 Config.powerBiContainerName);
 
         static OpenAIAnalyzer analyzer = new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel);
-        
+
     public static void main(String[] args) {
 
         Logger logger = LoggerFactory.getLogger(App.class);
         logger.debug("Starting logger");
 
+        List<Thread> threads = new ArrayList<>();
 
 
 
         try {
             // Transcribe:
             List<String> paths = audioSourceBlobStorage.fetchFile();
-            for (var audioFile : paths) {                
+            List<TranscribedTextAndLanguage> transcribedCalls = new ArrayList<>();
+            for (var audioFile : paths){
+                System.out.println("Transcribing: " + audioFile + "...");
 
+                TranscribedTextAndLanguage transcribedCall = speechToText.speechToText(audioFile);
+                transcribedCalls.add(transcribedCall);
+
+                String transcribedCallSavePath = Config.transcribedTextSaveDirectory +    // src/main/temp
+                        Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
+                        + ".txt"; // Make it a txt file
+                Utils.writeToFile(transcribedCallSavePath, transcribedCall.getTranscribedText());
+
+                textformatBlobStorage.saveToStorage(transcribedCallSavePath);
             }
+
+            for (int i = 0; i < paths.size(); i++) {
+
+                int finalI = i;
+                Thread thread = new Thread(() ->
+                {
+                    try {
+                        goooo(paths.get(finalI), transcribedCalls.get(finalI));
+                    } catch (ExecutionException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                thread.start();
+                threads.add(thread);
+            }
+
+            for (Thread thread : threads) {
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            // Vänta på att alla trådar ska slutföra
+
         } catch (Exception e) {
             e.printStackTrace();
-
             logger.error("Exception occured: ", e);
         } finally {
             System.exit(0);
         }
 
     }
-    public static void goooo(String audioFile) throws ExecutionException, InterruptedException {
-        System.out.println("Transcribing: " + audioFile + "...");
+    public static void goooo(String audioFile, TranscribedTextAndLanguage transcribedCall) throws ExecutionException, InterruptedException {
 
-        TranscribedTextAndLanguage transcribedCall = speechToText.speechToText(audioFile);
-
-        String transcribedCallSavePath = Config.transcribedTextSaveDirectory +    // src/main/temp
-                Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
-                + ".txt"; // Make it a txt file
-        Utils.writeToFile(transcribedCallSavePath, transcribedCall.getTranscribedText());
-
-        textformatBlobStorage.saveToStorage(transcribedCallSavePath);
 
         AnalyzeResult analyzedCallResult = analyzer.analyze(transcribedCall);
 
