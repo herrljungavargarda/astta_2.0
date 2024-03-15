@@ -18,69 +18,43 @@ import se.herrljunga.astta.utils.TranscribedTextAndLanguage;
 import se.herrljunga.astta.utils.Utils;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 public class App {
-    public static void main(String[] args) {
-
-        Logger logger = LoggerFactory.getLogger(App.class);
-        logger.debug("Starting logger");
-
-
         // Convert audio to text using Azure Speech-to-Text service
-        SpeechToText speechToText = new SpeechToTextImpl(
+        static SpeechToText speechToText = new SpeechToTextImpl(
                 KeyVault.getSecret(Config.speechToTextSecretName), // Azure Speech service key
                 Config.speechToTextRegion, // Azure Speech service region
                 Config.supportedLanguages.get(0), // Base language of the speech
                 AutoDetectSourceLanguageConfig.fromLanguages(Config.supportedLanguages) // In case the base language is wrong
         );
         // Fetch audio files from Azure Blob Storage
-        StorageHandler audioSourceBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+        static StorageHandler audioSourceBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
                 KeyVault.getSecret(Config.sasTokenSecretName),
                 Config.audioSourceContainerName);
-        StorageHandler textformatBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+        static StorageHandler textformatBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
                 KeyVault.getSecret(Config.sasTokenSecretName),
                 Config.textSaveContainerName);
-        StorageHandler powerBiBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+        static StorageHandler powerBiBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
                 KeyVault.getSecret(Config.sasTokenSecretName),
                 Config.powerBiContainerName);
 
-        OpenAIAnalyzer analyzer = new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel);
+        static OpenAIAnalyzer analyzer = new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel);
+        
+    public static void main(String[] args) {
+
+        Logger logger = LoggerFactory.getLogger(App.class);
+        logger.debug("Starting logger");
+
+
+
+
         try {
             // Transcribe:
             List<String> paths = audioSourceBlobStorage.fetchFile();
-            for (var audioFile : paths) {
+            for (var audioFile : paths) {                
 
-
-                if (audioFile.contains("onmicrosoft.com")) {
-
-                    System.out.println("Transcribing: " + audioFile + "...");
-
-                    if (audioFile.contains("testwav")) {
-
-                        TranscribedTextAndLanguage transcribedCall = speechToText.speechToText(audioFile);
-
-
-                        String transcribedCallSavePath = Config.transcribedTextSaveDirectory +    // src/main/temp
-                                Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
-                                + ".txt"; // Make it a txt file
-                        Utils.writeToFile(transcribedCallSavePath, transcribedCall.getTranscribedText());
-
-                        textformatBlobStorage.saveToStorage(transcribedCallSavePath);
-
-
-                        AnalyzeResult analyzedCallResult = analyzer.analyze(transcribedCall);
-
-                        String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getLanguage(), Utils.getAudioDuration(audioFile), analyzedCallResult.tokensUsed());
-                        String analyzedCallJsonPath = Config.jsonSaveDirectory +    // The json save location folder
-                                Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
-                                + ".json"; // Make it a json file
-                        AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
-                        Utils.writeToFile(analyzedCall);
-
-                        //powerBiBlobStorage.saveToStorage(analyzedCallJsonPath); //src/main/temp/file.json
-                    }
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,5 +63,29 @@ public class App {
         } finally {
             System.exit(0);
         }
+
+    }
+    public static void goooo(String audioFile) throws ExecutionException, InterruptedException {
+        System.out.println("Transcribing: " + audioFile + "...");
+
+        TranscribedTextAndLanguage transcribedCall = speechToText.speechToText(audioFile);
+
+        String transcribedCallSavePath = Config.transcribedTextSaveDirectory +    // src/main/temp
+                Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
+                + ".txt"; // Make it a txt file
+        Utils.writeToFile(transcribedCallSavePath, transcribedCall.getTranscribedText());
+
+        textformatBlobStorage.saveToStorage(transcribedCallSavePath);
+
+        AnalyzeResult analyzedCallResult = analyzer.analyze(transcribedCall);
+
+        String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getLanguage(), Utils.getAudioDuration(audioFile), analyzedCallResult.tokensUsed());
+        String analyzedCallJsonPath = Config.jsonSaveDirectory +    // The json save location folder
+                Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
+                + ".json"; // Make it a json file
+        AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
+        Utils.writeToFile(analyzedCall);
+        //powerBiBlobStorage.saveToStorage(analyzedCallJsonPath); //src/main/temp/file.json
+
     }
 }
