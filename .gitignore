@@ -44,3 +44,6 @@ build/
 /src/main/temp
 
 /src/main/resources/exampleText.txt
+
+# Logs
+/logs

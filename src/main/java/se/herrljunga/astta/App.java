@@ -51,7 +51,7 @@ public class App {
             List<String> paths = audioSourceBlobStorage.fetchFile();
             for (var audioFile : paths) {
 
-                if (audioFile.contains("testwav")) {
+                if (audioFile.contains("onmicrosoft.com")) {
 
                     System.out.println("Transcribing: " + audioFile + "...");
                     TranscribedTextAndLanguage transcribedCall = speechToText.speechToText(audioFile);
