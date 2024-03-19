@@ -167,4 +167,9 @@ public class Utils {
     public static void writeToFile(AnalyzedCall analyzedCall) {
         writeToFile(analyzedCall.savePath(), analyzedCall.analyzedCallJson());
     }
+
+    public static String getElementFromJson(String response, String elementToGet) {
+        JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
+        return jsonObject.get(elementToGet).getAsString();
+    }
 }
