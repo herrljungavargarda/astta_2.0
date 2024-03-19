@@ -1,7 +1,6 @@
 package se.herrljunga.astta;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageConfig;
 
 
@@ -22,6 +21,9 @@ import se.herrljunga.astta.utils.TranscribedTextAndLanguage;
 import se.herrljunga.astta.utils.Utils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -46,11 +48,15 @@ public class App {
                 KeyVault.getSecret(Config.sasTokenSecretName),
                 Config.powerBiContainerName);
 
+        static StorageHandler transcriptionDestinationBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+                KeyVault.getSecret(Config.sasTokenSecretName),
+                Config.transcriptionDestinationContainername);
+
         static OpenAIAnalyzer analyzer = new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel);
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        BatchTranscriber.startTranscription();
+        //BatchTranscriber.startTranscription();
 
         Logger logger = LoggerFactory.getLogger(App.class);
         logger.debug("Starting logger");
@@ -59,11 +65,39 @@ public class App {
 
         try {
             // Transcribe:
-            List<String> paths = audioSourceBlobStorage.fetchFile();
+            List<String> paths = transcriptionDestinationBlobStorage.fetchFile();
             List<TranscribedTextAndLanguage> transcribedCalls = new ArrayList<>();
 
 
-            paths.forEach(System.out::println);
+            //paths.forEach(System.out::println);
+            for(var path:paths){
+                if(!path.contains("_report")){
+                    String content = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+
+                    JsonElement jsonElement = JsonParser.parseString(content);
+                    JsonObject jsonObject = jsonElement.getAsJsonObject();
+                    JsonArray jsonArray = jsonObject.getAsJsonArray("combinedRecognizedPhrases");
+
+
+                    String transcription = "";
+
+                    for (JsonElement element : jsonArray) {
+                        JsonObject combinedRecognizedPhrase = element.getAsJsonObject();
+                        transcription = combinedRecognizedPhrase.get("display").getAsString();
+                    }
+
+                    System.out.println();
+                    System.out.println();
+                    System.out.println(transcription);
+
+                    TranscribedTextAndLanguage transcribedCall = new TranscribedTextAndLanguage(transcription, "sv-SE");
+                    transcribedCalls.add(transcribedCall);
+
+                }
+
+
+            }
+
             for (int i = 0; i < paths.size(); i++) {
 /*
 
