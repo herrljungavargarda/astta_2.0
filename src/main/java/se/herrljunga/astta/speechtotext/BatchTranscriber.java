@@ -20,9 +20,10 @@ public class BatchTranscriber {
         String response = batchTranscribe();
         String transcriptionUrl = Utils.getElementFromJson(response, "self");
         getTranscriptionStatus(transcriptionUrl);
+        System.out.print("Transcribing ");
         while (!getTranscriptionStatus(transcriptionUrl)) {
-            System.out.println(getTranscriptionStatus(transcriptionUrl));
-            Thread.sleep(10000);
+            System.out.print("֍");
+            Thread.sleep(5000);
         }
     }
 

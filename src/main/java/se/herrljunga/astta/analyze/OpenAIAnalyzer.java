@@ -49,7 +49,7 @@ public class OpenAIAnalyzer {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
         String filePath = "src/main/resources/prompt.txt";
         try {
-            logger.info("Starting analysis for transcribed text and language: " + transcribedTextAndLanguage);
+            logger.info("Starting analysis for transcribed text and language: " + transcribedTextAndLanguage.toString());
             String mainPrompt = Files.readAllLines(Paths.get(filePath)).stream().collect(Collectors.joining(System.lineSeparator()));
             chatMessages.add(new ChatRequestSystemMessage("Before continuing, REMOVE OLD CACHE."));
             chatMessages.add(new ChatRequestSystemMessage(mainPrompt));

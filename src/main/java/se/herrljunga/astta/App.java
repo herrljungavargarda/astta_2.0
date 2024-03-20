@@ -86,11 +86,7 @@ public class App {
                         transcription = combinedRecognizedPhrase.get("display").getAsString();
                     }
 
-                    System.out.println();
-                    System.out.println();
-                    System.out.println(transcription);
-
-                    TranscribedTextAndLanguage transcribedCall = new TranscribedTextAndLanguage(transcription, "sv-SE");
+                    TranscribedTextAndLanguage transcribedCall = new TranscribedTextAndLanguage(transcription, "sv-SE", path);
                     transcribedCalls.add(transcribedCall);
 
                 }
@@ -98,24 +94,19 @@ public class App {
 
             }
 
-            for (int i = 0; i < paths.size(); i++) {
-/*
-
-                int finalI = i;
-                Thread thread = new Thread(() ->
-                {
-                    try {
-                        goooo(paths.get(finalI), transcribedCalls.get(finalI));
-                    } catch (ExecutionException e) {
-                        throw new RuntimeException(e);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-                thread.start();
-                threads.add(thread);
-                */
-
+            for (var call:transcribedCalls) {
+                    Thread thread = new Thread(() ->
+                    {
+                        try {
+                            goooo(call);
+                        } catch (ExecutionException e) {
+                            throw new RuntimeException(e);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    thread.start();
+                    threads.add(thread);
             }
 
             for (Thread thread : threads) {
@@ -144,14 +135,15 @@ public class App {
 
 
 
-    public static void goooo(String audioFile, TranscribedTextAndLanguage transcribedCall) throws ExecutionException, InterruptedException {
+    public static void goooo(TranscribedTextAndLanguage transcribedCall) throws ExecutionException, InterruptedException {
 
 
         AnalyzeResult analyzedCallResult = analyzer.analyze(transcribedCall);
 
-        String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getLanguage(), Utils.getAudioDuration(audioFile), analyzedCallResult.tokensUsed());
+
+        String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getLanguage(), 100, analyzedCallResult.tokensUsed());
         String analyzedCallJsonPath = Config.jsonSaveDirectory +    // The json save location folder
-                Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
+                Utils.getFileName(transcribedCall.getPath()) // Adds the filename of the audiofile (removes path)
                 + ".json"; // Make it a json file
         AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
         Utils.writeToFile(analyzedCall);

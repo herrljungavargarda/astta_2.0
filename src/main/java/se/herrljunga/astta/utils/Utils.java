@@ -136,7 +136,8 @@ public class Utils {
             logger.info("Done creating and parsing json");
             return gson.toJson(jsonObject);
         } catch (JsonParseException e) {
-            logger.error("An error occurred when trying to parse Json." + e);
+            logger.error("An error occurred when trying to parse Json." + e );
+            logger.error("Json: " + content);
             throw new RuntimeException("Exception thrown in Utils, createJson " + e.getMessage());
         }
     }

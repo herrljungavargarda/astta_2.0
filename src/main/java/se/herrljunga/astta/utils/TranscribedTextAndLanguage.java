@@ -13,10 +13,16 @@ public class TranscribedTextAndLanguage {
     private String transcribedText;
 
     private String language;
+    private String path;
 
-    public TranscribedTextAndLanguage(String transcribedText, String language) {
+    public String getPath() {
+        return path;
+    }
+
+    public TranscribedTextAndLanguage(String transcribedText, String language, String path) {
         this.transcribedText = transcribedText;
         this.language = language;
+        this.path = path;
     }
 
     public String getTranscribedText() {
@@ -33,5 +39,10 @@ public class TranscribedTextAndLanguage {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    @Override
+    public String toString() {
+        return getPath();
     }
 }
