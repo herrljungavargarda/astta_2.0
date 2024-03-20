@@ -50,35 +50,27 @@ public class App {
             List<String> paths = audioSourceBlobStorage.fetchFile();
             for (var audioFile : paths) {
 
-<<<<<<< HEAD
-                if (audioFile.contains("onmicrosoft.com")) {
-
-                    System.out.println("Transcribing: " + audioFile + "...");
-=======
-                if (audioFile.contains("testwav")) {
->>>>>>> 30e7fe9a96406fe069394250b103b3f01995e3fc
-                    TranscribedTextAndLanguage transcribedCall = speechToText.speechToText(audioFile);
+                TranscribedTextAndLanguage transcribedCall = speechToText.speechToText(audioFile);
 
 
-                    String transcribedCallSavePath = Config.transcribedTextSaveDirectory +    // src/main/temp
-                            Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
-                            + ".txt"; // Make it a txt file
-                    Utils.writeToFile(transcribedCallSavePath, transcribedCall.getTranscribedText());
+                String transcribedCallSavePath = Config.transcribedTextSaveDirectory +    // src/main/temp
+                        Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
+                        + ".txt"; // Make it a txt file
+                Utils.writeToFile(transcribedCallSavePath, transcribedCall.getTranscribedText());
 
-                    textformatBlobStorage.saveToStorage(transcribedCallSavePath);
+                textformatBlobStorage.saveToStorage(transcribedCallSavePath);
 
 
-                    AnalyzeResult analyzedCallResult = analyzer.analyze(transcribedCall);
+                AnalyzeResult analyzedCallResult = analyzer.analyze(transcribedCall);
 
-                    String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getLanguage(), Utils.getAudioDuration(audioFile), analyzedCallResult.tokensUsed());
-                    String analyzedCallJsonPath = Config.jsonSaveDirectory +    // The json save location folder
-                            Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
-                            + ".json"; // Make it a json file
-                    AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
-                    Utils.writeToFile(analyzedCall);
+                String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getLanguage(), Utils.getAudioDuration(audioFile), analyzedCallResult.tokensUsed());
+                String analyzedCallJsonPath = Config.jsonSaveDirectory +    // The json save location folder
+                        Utils.getFileName(audioFile) // Adds the filename of the audiofile (removes path)
+                        + ".json"; // Make it a json file
+                AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
+                Utils.writeToFile(analyzedCall);
 
-                    //powerBiBlobStorage.saveToStorage(analyzedCallJsonPath); //src/main/temp/file.json
-                }
+                powerBiBlobStorage.saveToStorage(analyzedCallJsonPath); //src/main/temp/file.json
             }
         } catch (Exception e) {
             e.printStackTrace();
