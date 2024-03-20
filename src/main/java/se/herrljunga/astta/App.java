@@ -11,6 +11,7 @@ import se.herrljunga.astta.analyze.OpenAIAnalyzer;
 import se.herrljunga.astta.filehandler.BlobStorageHandler;
 import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.keyvault.KeyVault;
+import se.herrljunga.astta.speechtotext.BatchTranscriber;
 import se.herrljunga.astta.speechtotext.SpeechToText;
 import se.herrljunga.astta.speechtotext.SpeechToTextImpl;
 import se.herrljunga.astta.utils.AnalyzedCall;
@@ -25,6 +26,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 public class App {
@@ -54,7 +58,7 @@ public class App {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        //BatchTranscriber.startTranscription();
+        BatchTranscriber.startTranscription();
 
         Logger logger = LoggerFactory.getLogger(App.class);
         logger.debug("Starting logger");
@@ -104,33 +108,42 @@ public class App {
 
     }
 
+    /**
+     * Starts multi-threaded analysis of transcribed calls.
+     * <p>
+     * This method uses an ExecutorService to manage threads. Each transcribed call is analyzed in a separate thread.
+     * The method waits for all threads to complete before it returns.
+     *
+     * @param transcribedCalls a list of transcribed calls to be analyzed
+     */
     private static void startMultiThreadedAnalysis(List<TranscribedCallInformation> transcribedCalls) {
-        List<Thread> threads = new ArrayList<>();
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        List<Future<?>> futures = new ArrayList<>();
+
         for (var call: transcribedCalls) {
-                Thread thread = new Thread(() ->
-                {
-                    try {
-                        AnalyzeResult analyzedCallResult = analyzer.getAnalyzeResult(call);
-                        buildJsonFile(analyzedCallResult, call);
-                    } catch (ExecutionException e) {
-                        throw new RuntimeException(e);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-                thread.start();
-                threads.add(thread);
+            Future<?> future = executorService.submit(() -> {
+                try {
+                    AnalyzeResult analyzedCallResult = analyzer.getAnalyzeResult(call);
+                    buildJsonFile(analyzedCallResult, call);
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            futures.add(future);
         }
 
-        // Vänta på att alla trådar ska slutföra
-        for (Thread thread : threads) {
+        // Wait for all tasks to complete
+        for (Future<?> future : futures) {
             try {
-                thread.join();
-            } catch (InterruptedException e) {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
 
+        executorService.shutdown(); // Always remember to shutdown the executor service
     }
 
     public static void buildJsonFile(AnalyzeResult analyzedCallResult, TranscribedCallInformation transcribedCall) throws ExecutionException, InterruptedException {

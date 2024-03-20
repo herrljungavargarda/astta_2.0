@@ -52,7 +52,6 @@ public class OpenAIAnalyzer {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
         String filePath = "src/main/resources/prompt.txt";
         try {
-            logger.info("Starting analysis for transcribed text and language: " + transcribedCallInformation.toString());
             String mainPrompt = Files.readAllLines(Paths.get(filePath)).stream().collect(Collectors.joining(System.lineSeparator()));
             chatMessages.add(new ChatRequestSystemMessage("Before continuing, REMOVE OLD CACHE."));
             chatMessages.add(new ChatRequestSystemMessage(mainPrompt));
@@ -74,16 +73,21 @@ public class OpenAIAnalyzer {
         }
     }
 
+
     @NotNull
     public AnalyzeResult getAnalyzeResult(TranscribedCallInformation transcribedCall) {
         AnalyzeResult analyzedCallResult = null;
         for(int i = 1; i<=3; i++){
-            LoggerFactory.getLogger(App.class).info("Analyzing" + transcribedCall.getPath() + " attempt: " + i);
+            LoggerFactory.getLogger(App.class).info("Analyzing " + Utils.removePathFromFilename(transcribedCall.getPath()) + " attempt: " + i);
             analyzedCallResult = analyze(transcribedCall);
 
             if(Utils.validateJson(analyzedCallResult.result())){
                 break;
             }
+            else if(i == 3){
+                throw new RuntimeException("Couldn't create valid JSON file");
+            }
+
         }
         return analyzedCallResult;
     }
