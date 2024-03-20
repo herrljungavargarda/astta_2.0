@@ -12,6 +12,7 @@ public class Config {
     public static String audioSourceContainerName = "wavfiles"; // The blob container name where the wav-files are saved
     public static String textSaveContainerName = "textfiles"; // The blob container name where the text files will be saved to
     public static String powerBiContainerName = "pwrbi"; // The blob container name where the finished JSON saved will be saved
+    public static String transcriptionDestinationContainername = "test"; // The blob container name where the transcription results will be saved
     public static String sasTokenSecretName = "sastoken"; // Your secret key, (can be generated when signed in to Azure Portal under Storage account, Shared access signature)
     public static String blobStorageEndpoint = "blobstorageendpoint"; // Your blob storage endpoint
 
@@ -24,4 +25,7 @@ public class Config {
     public static String pathToTemp = "src/main/temp/";
     public static String jsonSaveDirectory = "src/main/temp/";
     public static String transcribedTextSaveDirectory = "src/main/temp/";
+    public static String sasTokenTranscriptionBlobSecretName = "sasTokenTranscriptionBlob";
+
+    public static String transcriptionApiUrl = "https://swedencentral.api.cognitive.microsoft.com/speechtotext/v3.1/transcriptions/";
 }

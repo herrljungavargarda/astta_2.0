@@ -4,9 +4,12 @@ import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.ai.openai.models.*;
 import com.azure.core.credential.AzureKeyCredential;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.herrljunga.astta.utils.TranscribedTextAndLanguage;
+import se.herrljunga.astta.App;
+import se.herrljunga.astta.utils.TranscribedCallInformation;
+import se.herrljunga.astta.utils.Utils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,22 +42,20 @@ public class OpenAIAnalyzer {
     /**
      * Analyzes transcribed text and language to generate chat completions and usage statistics.
      *
-     * @param transcribedTextAndLanguage the transcribed text along with its language
+     * @param transcribedCallInformation the transcribed text along with its language
      * @return an AnalyzeResult object containing chat completions and usage statistics
      * The main prompt can be found under src/main/resources/prompt.txt
      * If you wish to change the output format or add/remove anything you can edit that file.
      * We would recommend to follow the prompt style used.
      */
-    public AnalyzeResult analyze(TranscribedTextAndLanguage transcribedTextAndLanguage) {
+    public AnalyzeResult analyze(TranscribedCallInformation transcribedCallInformation) {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
         String filePath = "src/main/resources/prompt.txt";
         try {
-            logger.info("Starting analysis for transcribed text and language: " + transcribedTextAndLanguage);
             String mainPrompt = Files.readAllLines(Paths.get(filePath)).stream().collect(Collectors.joining(System.lineSeparator()));
             chatMessages.add(new ChatRequestSystemMessage("Before continuing, REMOVE OLD CACHE."));
             chatMessages.add(new ChatRequestSystemMessage(mainPrompt));
-            chatMessages.add(new ChatRequestSystemMessage("Spoken language: " + transcribedTextAndLanguage.getLanguage()));
-            chatMessages.add(new ChatRequestUserMessage(transcribedTextAndLanguage.getTranscribedText()));
+            chatMessages.add(new ChatRequestUserMessage(transcribedCallInformation.getTranscribedText()));
             ChatCompletions chatCompletions = client.getChatCompletions(deploymentOrModelId, new ChatCompletionsOptions(chatMessages));
 
             StringBuilder sb = new StringBuilder();
@@ -70,5 +71,24 @@ public class OpenAIAnalyzer {
             logger.error("An error occurred when reading prompt.txt: " + e.getMessage());
             throw new RuntimeException("Exception thrown in OpenAiAnalyzer, analyze " + e.getMessage());
         }
+    }
+
+
+    @NotNull
+    public AnalyzeResult getAnalyzeResult(TranscribedCallInformation transcribedCall) {
+        AnalyzeResult analyzedCallResult = null;
+        for(int i = 1; i<=3; i++){
+            LoggerFactory.getLogger(App.class).info("Analyzing " + Utils.removePathFromFilename(transcribedCall.getPath()) + " attempt: " + i);
+            analyzedCallResult = analyze(transcribedCall);
+
+            if(Utils.validateJson(analyzedCallResult.result())){
+                break;
+            }
+            else if(i == 3){
+                throw new RuntimeException("Couldn't create valid JSON file");
+            }
+
+        }
+        return analyzedCallResult;
     }
 }

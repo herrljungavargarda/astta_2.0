@@ -64,8 +64,8 @@ public class BlobStorageHandler implements StorageHandler {
                 logger.info("Fetching file: " + blobName);
                 // blobName - Adding the same name as the file in Blob Storage
                 BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
-                blobClient.downloadToFile(Config.pathToTemp + blobName);
-                paths.add(Config.pathToTemp + blobName);
+                blobClient.downloadToFile(Config.pathToTemp + Utils.removePathFromFilename(blobName));
+                paths.add(Config.pathToTemp + Utils.removePathFromFilename(blobName));
             }
             logger.info("Done fetching files");
 

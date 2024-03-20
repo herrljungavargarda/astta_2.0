@@ -2,15 +2,12 @@ package se.herrljunga.astta.speechtotext;
 
 import com.microsoft.cognitiveservices.speech.*;
 import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
-import com.microsoft.cognitiveservices.speech.audio.AudioInputStream;
-import com.microsoft.cognitiveservices.speech.audio.PushAudioInputStream;
 import com.microsoft.cognitiveservices.speech.transcription.ConversationTranscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.herrljunga.astta.utils.TranscribedTextAndLanguage;
+import se.herrljunga.astta.utils.TranscribedCallInformation;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -49,10 +46,10 @@ public class SpeechToTextImpl implements SpeechToText {
      * @throws ExecutionException   If an error occurs during the execution of the transcription process.
      */
     @Override
-    public TranscribedTextAndLanguage speechToText(String path) {
+    public TranscribedCallInformation speechToText(String path) {
         logger.info("Starting speech to text conversion for file at path: " + path);
         try {
-            TranscribedTextAndLanguage transcribedTextAndLanguage = new TranscribedTextAndLanguage();
+            TranscribedCallInformation transcribedCallInformation = new TranscribedCallInformation();
             sb = new StringBuilder();
             stopRecognitionSemaphore = new Semaphore(0);
             audioConfig = AudioConfig.fromWavFileInput(path);
@@ -67,7 +64,7 @@ public class SpeechToTextImpl implements SpeechToText {
                     if (!languageDetected.get()) { // Check if transcribedTextAndLanguage detection has been executed
                         AutoDetectSourceLanguageResult autoDetectSourceLanguageResult = AutoDetectSourceLanguageResult.fromResult(e.getResult());
                         String detectedLanguage = autoDetectSourceLanguageResult.getLanguage();
-                        transcribedTextAndLanguage.setLanguage(detectedLanguage);
+                        //transcribedCallInformation.setLanguage(detectedLanguage);
 
                         languageDetected.set(true); // Set the flag to true to indicate transcribedTextAndLanguage detection has been executed
                     }
@@ -95,10 +92,10 @@ public class SpeechToTextImpl implements SpeechToText {
             stopRecognitionSemaphore.acquire();
             conversationTranscriber.stopTranscribingAsync().get();
 
-            transcribedTextAndLanguage.setTranscribedText(sb.toString());
+            transcribedCallInformation.setTranscribedText(sb.toString());
 
             logger.info("Completed speech to text conversion for file at path: " + path);
-            return transcribedTextAndLanguage;
+            return transcribedCallInformation;
         }
         catch (InterruptedException | ExecutionException e) {
             logger.error("An error occurred when transcribing audio file" + e);
