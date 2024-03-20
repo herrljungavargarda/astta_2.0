@@ -4,7 +4,6 @@ import com.google.gson.*;
 import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageConfig;
 
 
-import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.herrljunga.astta.analyze.AnalyzeResult;
@@ -12,12 +11,11 @@ import se.herrljunga.astta.analyze.OpenAIAnalyzer;
 import se.herrljunga.astta.filehandler.BlobStorageHandler;
 import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.keyvault.KeyVault;
-import se.herrljunga.astta.speechtotext.BatchTranscriber;
 import se.herrljunga.astta.speechtotext.SpeechToText;
 import se.herrljunga.astta.speechtotext.SpeechToTextImpl;
 import se.herrljunga.astta.utils.AnalyzedCall;
 import se.herrljunga.astta.utils.Config;
-import se.herrljunga.astta.utils.TranscribedTextAndLanguage;
+import se.herrljunga.astta.utils.TranscribedCallInformation;
 import se.herrljunga.astta.utils.Utils;
 
 import java.io.IOException;
@@ -61,12 +59,12 @@ public class App {
         Logger logger = LoggerFactory.getLogger(App.class);
         logger.debug("Starting logger");
 
-        List<Thread> threads = new ArrayList<>();
+
 
         try {
             // Transcribe:
             List<String> paths = transcriptionDestinationBlobStorage.fetchFile();
-            List<TranscribedTextAndLanguage> transcribedCalls = new ArrayList<>();
+            List<TranscribedCallInformation> transcribedCalls = new ArrayList<>();
 
 
             //paths.forEach(System.out::println);
@@ -79,14 +77,15 @@ public class App {
                     JsonArray jsonArray = jsonObject.getAsJsonArray("combinedRecognizedPhrases");
 
 
-                    String transcription = "";
+                    String transcription = null;
 
                     for (JsonElement element : jsonArray) {
                         JsonObject combinedRecognizedPhrase = element.getAsJsonObject();
                         transcription = combinedRecognizedPhrase.get("display").getAsString();
                     }
+                    String duration = Utils.getElementFromJson(content, "duration");
 
-                    TranscribedTextAndLanguage transcribedCall = new TranscribedTextAndLanguage(transcription, "sv-SE", path);
+                    TranscribedCallInformation transcribedCall = new TranscribedCallInformation(transcription, duration, path);
                     transcribedCalls.add(transcribedCall);
 
                 }
@@ -94,29 +93,7 @@ public class App {
 
             }
 
-            for (var call:transcribedCalls) {
-                    Thread thread = new Thread(() ->
-                    {
-                        try {
-                            goooo(call);
-                        } catch (ExecutionException e) {
-                            throw new RuntimeException(e);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                    thread.start();
-                    threads.add(thread);
-            }
-
-            for (Thread thread : threads) {
-                try {
-                    thread.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            // Vänta på att alla trådar ska slutföra
+            startMultiThreadedAnalysis(transcribedCalls);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,27 +104,42 @@ public class App {
 
     }
 
+    private static void startMultiThreadedAnalysis(List<TranscribedCallInformation> transcribedCalls) {
+        List<Thread> threads = new ArrayList<>();
+        for (var call: transcribedCalls) {
+                Thread thread = new Thread(() ->
+                {
+                    try {
+                        AnalyzeResult analyzedCallResult = analyzer.getAnalyzeResult(call);
+                        buildJsonFile(analyzedCallResult, call);
+                    } catch (ExecutionException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                thread.start();
+                threads.add(thread);
+        }
 
+        // Vänta på att alla trådar ska slutföra
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
+    }
 
-
-
-
-
-
-    public static void goooo(TranscribedTextAndLanguage transcribedCall) throws ExecutionException, InterruptedException {
-
-
-        AnalyzeResult analyzedCallResult = analyzer.analyze(transcribedCall);
-
-
-        String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getLanguage(), 100, analyzedCallResult.tokensUsed());
+    public static void buildJsonFile(AnalyzeResult analyzedCallResult, TranscribedCallInformation transcribedCall) throws ExecutionException, InterruptedException {
+        String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getCallDuration(), analyzedCallResult.tokensUsed());
         String analyzedCallJsonPath = Config.jsonSaveDirectory +    // The json save location folder
                 Utils.getFileName(transcribedCall.getPath()) // Adds the filename of the audiofile (removes path)
                 + ".json"; // Make it a json file
         AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
         Utils.writeToFile(analyzedCall);
         //powerBiBlobStorage.saveToStorage(analyzedCallJsonPath); //src/main/temp/file.json
-
     }
 }

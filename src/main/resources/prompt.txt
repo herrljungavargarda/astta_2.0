@@ -4,7 +4,8 @@ Information about the call: There will always be dialogue between two speakers. 
 
 General instructions:
 Always write all answers in swedish and lowercase.
-When identifying and extracting information from the call provide how confident you are in a scale from 0-100%.
+When using quotes, ALWAYS use double quotes e.g. (") and NEVER use single quotes (').
+When identifying and extracting information from the call provide how confident you are in a scale from 0-100 without any suffix or prefix.
 Follow the steps and output in .JSON as shown (Output Format).
 
 Steps:
@@ -14,6 +15,7 @@ Steps:
 4. Department: Which management (förvaltning), operation (verksamhet) or unit (enhet) the caller calls from: ("kunskapskällan", "sundlergymnasiet", "individ och familjeomsorg", "socialtstöd", "bygg och miljö", "etc", "okänt").
 5. Identify agent name and extract it, choose from: ("Alexander", "Henrik", "Linus", "Axel").
 6. Identify if the issue is solved or not, answer with true(solved) false(unsolved).
+7. Identify which language is spoken, use the correct language code ("sv-SE","en-US", etc.).
 
 Output Format:
 {
@@ -27,7 +29,7 @@ Output Format:
     "Confidence": "confidence score"
   },
   "Department": {
-    "Department": "Department",
+    "Department": "department",
     "Confidence": "confidence score"
   },
   "IssueSolved": {
@@ -36,6 +38,10 @@ Output Format:
   },
   "AgentName": {
     "Name": "agent",
+    "Confidence": "confidence score"
+  },
+  "Language": {
+    "LanguageCode": "language code",
     "Confidence": "confidence score"
   }
 }

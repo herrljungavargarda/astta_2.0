@@ -4,24 +4,24 @@ package se.herrljunga.astta.utils;
  * A class representing transcribed text along with its associated language.
  */
 
-public class TranscribedTextAndLanguage {
+public class TranscribedCallInformation {
 
 
-    public TranscribedTextAndLanguage() {
+    public TranscribedCallInformation() {
     }
 
     private String transcribedText;
 
-    private String language;
+    private String callDuration;
     private String path;
 
     public String getPath() {
         return path;
     }
 
-    public TranscribedTextAndLanguage(String transcribedText, String language, String path) {
+    public TranscribedCallInformation(String transcribedText, String callDuration, String path) {
         this.transcribedText = transcribedText;
-        this.language = language;
+        this.callDuration = callDuration;
         this.path = path;
     }
 
@@ -29,16 +29,18 @@ public class TranscribedTextAndLanguage {
         return transcribedText;
     }
 
-    public String getLanguage() {
-        return language;
-    }
+
 
     public void setTranscribedText(String transcribedText) {
         this.transcribedText = transcribedText;
     }
 
-    public void setLanguage(String language) {
-        this.language = language;
+    public String getCallDuration() {
+        return callDuration;
+    }
+
+    public void setCallDuration(String callDuration) {
+        this.callDuration = callDuration;
     }
 
     @Override

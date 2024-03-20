@@ -120,16 +120,17 @@ public class Utils {
      * Creates a json object and adds language, duration and tokensUsed to the json object
      *
      * @param content    The "base" content of the json file
-     * @param language   The language of the call
      * @param duration   The duration of the call
      * @param tokensUsed Tokens used in the analyzing process
      * @return a json string of a complete json object
      **/
-    public static String createJson(String content, String language, double duration, int tokensUsed) {
+
+
+
+    public static String createJson(String content, String duration, int tokensUsed) {
         logger.info("Creating and parsing json");
         try {
             JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
-            jsonObject.addProperty("Language", language);
             jsonObject.addProperty("FileLength", duration);
             jsonObject.addProperty("TokensUsed", tokensUsed);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -139,6 +140,18 @@ public class Utils {
             logger.error("An error occurred when trying to parse Json." + e );
             logger.error("Json: " + content);
             throw new RuntimeException("Exception thrown in Utils, createJson " + e.getMessage());
+        }
+    }
+
+    public static boolean validateJson(String jsonToValidate){
+
+        try{
+            new Gson().fromJson(jsonToValidate, JsonObject.class);
+            return true;
+        }
+        catch (Exception e){
+            logger.error("Bad json string:\n" + jsonToValidate);
+            return false;
         }
     }
 

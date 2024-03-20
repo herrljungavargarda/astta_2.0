@@ -1,11 +1,10 @@
 package se.herrljunga.astta.speechtotext;
 
-import se.herrljunga.astta.utils.TranscribedTextAndLanguage;
+import se.herrljunga.astta.utils.TranscribedCallInformation;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public interface SpeechToText {
-    TranscribedTextAndLanguage speechToText(String path) throws InterruptedException, ExecutionException;
+    TranscribedCallInformation speechToText(String path) throws InterruptedException, ExecutionException;
     void close();
 }
