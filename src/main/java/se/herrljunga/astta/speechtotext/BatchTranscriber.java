@@ -6,15 +6,16 @@ import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import se.herrljunga.astta.keyvault.KeyVault;
 import se.herrljunga.astta.utils.Config;
+import se.herrljunga.astta.utils.GenerateSasToken;
 import se.herrljunga.astta.utils.Utils;
 
 import java.io.IOException;
 
 public class BatchTranscriber {
-    private static String speechToTextKey = KeyVault.getSecret(Config.speechToTextSecretName);
 
+    private static String speechToTextKey = KeyVault.getSecret(Config.speechToTextSecretName);
     private static String audioSourceContainerUrl = KeyVault.getSecret(Config.blobStorageEndpoint) + "/" + Config.audioSourceContainerName + "?" + KeyVault.getSecret(Config.sasTokenSecretName);
-    private static String destinationContainerUrl = KeyVault.getSecret(Config.blobStorageEndpoint) + "/" + Config.transcriptionDestinationContainername + "?" + KeyVault.getSecret(Config.sasTokenTranscriptionBlobSecretName);
+    private static String destinationContainerUrl = KeyVault.getSecret(Config.blobStorageEndpoint) + "/" + Config.transcriptionDestinationContainerName + "?" + GenerateSasToken.getTempContainerSasToken();
 
     public static void startTranscription() throws IOException, InterruptedException {
         String response = batchTranscribe();

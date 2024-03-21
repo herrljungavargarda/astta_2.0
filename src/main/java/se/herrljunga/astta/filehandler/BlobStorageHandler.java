@@ -1,5 +1,6 @@
 package se.herrljunga.astta.filehandler;
 
+import com.azure.core.util.Context;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
@@ -7,9 +8,15 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.implementation.models.StorageErrorException;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.blob.models.PublicAccessType;
+import com.azure.storage.blob.options.BlobContainerCreateOptions;
+import com.azure.storage.blob.sas.BlobContainerSasPermission;
+import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
+import com.azure.storage.common.StorageSharedKeyCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.herrljunga.astta.utils.Config;
+import se.herrljunga.astta.utils.GenerateSasToken;
 import se.herrljunga.astta.utils.Utils;
 
 import java.io.ByteArrayOutputStream;
@@ -17,6 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +35,8 @@ import java.util.List;
 public class BlobStorageHandler implements StorageHandler {
     BlobServiceClient blobServiceClient;
     BlobContainerClient blobContainerClient;
-
+    List<String> blobFilePath = new ArrayList<>();
+    public String token;
     Logger logger = LoggerFactory.getLogger(BlobStorageHandler.class);
 
     /**
@@ -41,8 +51,15 @@ public class BlobStorageHandler implements StorageHandler {
                 .endpoint(endpoint)
                 .sasToken(sasToken)
                 .buildClient();
-
         this.blobContainerClient = blobServiceClient.getBlobContainerClient(blobContainerName);
+    }
+
+    public BlobStorageHandler(String endpoint, String sasToken, StorageSharedKeyCredential credential) {
+        this.blobServiceClient = new BlobServiceClientBuilder()
+                .endpoint(endpoint)
+                .sasToken(sasToken)
+                .credential(credential)
+                .buildClient();
     }
 
 
@@ -64,6 +81,7 @@ public class BlobStorageHandler implements StorageHandler {
                 logger.info("Fetching file: " + blobName);
                 // blobName - Adding the same name as the file in Blob Storage
                 BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
+                blobFilePath.add(blobName);
                 blobClient.downloadToFile(Config.pathToTemp + Utils.removePathFromFilename(blobName));
                 paths.add(Config.pathToTemp + Utils.removePathFromFilename(blobName));
             }
@@ -94,6 +112,24 @@ public class BlobStorageHandler implements StorageHandler {
         logger.info("Done saving to storage: " + filePath);
     }
 
+    public void deleteContainer() {
+        blobContainerClient.deleteIfExists();
+    }
+
+    public void createTempContainer(String containerName) {
+        try {
+            var response = blobServiceClient.createBlobContainerIfNotExistsWithResponse(containerName, null, Context.NONE);
+            BlobContainerClient newContainerClient= response.getValue();
+            // Generate a SAS token with write rights for the new blob container
+            GenerateSasToken.generateSasToken(newContainerClient);
+            Thread.sleep(500);
+        } catch (BlobStorageException e) {
+            System.err.println("Error creating new container: " + e.getMessage());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Deletes specified file from Blob Storage
      *
@@ -102,16 +138,21 @@ public class BlobStorageHandler implements StorageHandler {
 
     @Override
     public void deleteFromStorage(String fileToDeletePath) {
-        logger.info("Deleting file from storage: " + fileToDeletePath);
+        logger.info("Deleting file from storage: " + Utils.removePathFromFilename(fileToDeletePath));
         try {
             BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(fileToDeletePath));
             blobClient.deleteIfExists();
-        }
-        catch (BlobStorageException | StorageErrorException e) {
+        } catch (BlobStorageException | StorageErrorException e) {
             logger.info("Error deleting files from blob: ", e);
             throw new RuntimeException("Exception thrown in BlobStorageHandler, deleteFromStorage " + e.getMessage());
         }
-        logger.info("Done deleting from storage: " + fileToDeletePath);
+        logger.info("Done deleting from storage: " + Utils.removePathFromFilename(fileToDeletePath));
     }
 
+    public List<String> getBlobFilePath() {
+        if (blobFilePath.isEmpty()) {
+            fetchFile();
+        }
+        return blobFilePath;
+    }
 }

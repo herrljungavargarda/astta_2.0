@@ -9,10 +9,12 @@ public class Config {
     public static String speechToTextSecretName = "speechtotextkey"; // Your secret key, (can be found when signed in to Azure Portal under Speech service, Keys and Endpoint)
 
     //Blob storage
+    public static String accountSecretName = "accountname";
+    public static String accountSecretKey = "accountkey";
     public static String audioSourceContainerName = "wavfiles"; // The blob container name where the wav-files are saved
     public static String textSaveContainerName = "textfiles"; // The blob container name where the text files will be saved to
     public static String powerBiContainerName = "pwrbi"; // The blob container name where the finished JSON saved will be saved
-    public static String transcriptionDestinationContainername = "test"; // The blob container name where the transcription results will be saved
+    public static String transcriptionDestinationContainerName = "temp"; // The blob container name where the transcription results will be saved
     public static String sasTokenSecretName = "sastoken"; // Your secret key, (can be generated when signed in to Azure Portal under Storage account, Shared access signature)
     public static String blobStorageEndpoint = "blobstorageendpoint"; // Your blob storage endpoint
 

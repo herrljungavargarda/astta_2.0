@@ -1,5 +1,10 @@
 package se.herrljunga.astta;
 
+import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.common.StorageSharedKeyCredential;
 import com.google.gson.*;
 import com.microsoft.cognitiveservices.speech.AutoDetectSourceLanguageConfig;
 
@@ -32,54 +37,47 @@ import java.util.concurrent.Future;
 
 
 public class App {
-        // Convert audio to text using Azure Speech-to-Text service
-        static SpeechToText speechToText = new SpeechToTextImpl(
-                KeyVault.getSecret(Config.speechToTextSecretName), // Azure Speech service key
-                Config.speechToTextRegion, // Azure Speech service region
-                Config.supportedLanguages.get(0), // Base language of the speech
-                AutoDetectSourceLanguageConfig.fromLanguages(Config.supportedLanguages) // In case the base language is wrong
-        );
-        // Fetch audio files from Azure Blob Storage
-        static StorageHandler audioSourceBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
-                KeyVault.getSecret(Config.sasTokenSecretName),
-                Config.audioSourceContainerName);
-        static StorageHandler textformatBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
-                KeyVault.getSecret(Config.sasTokenSecretName),
-                Config.textSaveContainerName);
-        static StorageHandler powerBiBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
-                KeyVault.getSecret(Config.sasTokenSecretName),
-                Config.powerBiContainerName);
+    static StorageHandler textformatBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+            KeyVault.getSecret(Config.sasTokenSecretName),
+            Config.textSaveContainerName);
+    static StorageHandler powerBiBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+            KeyVault.getSecret(Config.sasTokenSecretName),
+            Config.powerBiContainerName);
 
-        static StorageHandler transcriptionDestinationBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
-                KeyVault.getSecret(Config.sasTokenSecretName),
-                Config.transcriptionDestinationContainername);
+    static StorageHandler transcriptionDestinationBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+            KeyVault.getSecret(Config.sasTokenSecretName),
+            Config.transcriptionDestinationContainerName);
 
-        static OpenAIAnalyzer analyzer = new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel);
+    static StorageHandler createTempContainer = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+            KeyVault.getSecret(Config.sasTokenSecretName),
+            new StorageSharedKeyCredential(KeyVault.getSecret(Config.accountSecretName), KeyVault.getSecret(Config.accountSecretKey)));
+
+    static OpenAIAnalyzer analyzer = new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel);
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        BatchTranscriber.startTranscription();
 
         Logger logger = LoggerFactory.getLogger(App.class);
         logger.debug("Starting logger");
 
 
-
         try {
+            createTempContainer.createTempContainer(Config.transcriptionDestinationContainerName);
+            BatchTranscriber.startTranscription();
             // Transcribe:
+
             List<String> paths = transcriptionDestinationBlobStorage.fetchFile();
             List<TranscribedCallInformation> transcribedCalls = new ArrayList<>();
-
-
-            //paths.forEach(System.out::println);
-            for(var path:paths){
-                if(!path.contains("_report")){
-                    String content = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            for (var path : paths) {
+                if (path.contains("_report")) {
+                    textformatBlobStorage.saveToStorage(path);
+                }
+                if (!path.contains("_report")) {
+                    String content = Files.readString(Paths.get(path));
 
                     JsonElement jsonElement = JsonParser.parseString(content);
                     JsonObject jsonObject = jsonElement.getAsJsonObject();
                     JsonArray jsonArray = jsonObject.getAsJsonArray("combinedRecognizedPhrases");
-
 
                     String transcription = null;
 
@@ -93,12 +91,9 @@ public class App {
                     transcribedCalls.add(transcribedCall);
 
                 }
-
-
             }
-
             startMultiThreadedAnalysis(transcribedCalls);
-
+            transcriptionDestinationBlobStorage.deleteContainer();
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Exception occured: ", e);
@@ -120,7 +115,7 @@ public class App {
         ExecutorService executorService = Executors.newCachedThreadPool();
         List<Future<?>> futures = new ArrayList<>();
 
-        for (var call: transcribedCalls) {
+        for (var call : transcribedCalls) {
             Future<?> future = executorService.submit(() -> {
                 try {
                     AnalyzeResult analyzedCallResult = analyzer.getAnalyzeResult(call);
@@ -142,7 +137,6 @@ public class App {
                 e.printStackTrace();
             }
         }
-
         executorService.shutdown(); // Always remember to shutdown the executor service
     }
 
@@ -153,6 +147,6 @@ public class App {
                 + ".json"; // Make it a json file
         AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
         Utils.writeToFile(analyzedCall);
-        //powerBiBlobStorage.saveToStorage(analyzedCallJsonPath); //src/main/temp/file.json
+        powerBiBlobStorage.saveToStorage(analyzedCallJsonPath); //src/main/temp/file.json
     }
 }
