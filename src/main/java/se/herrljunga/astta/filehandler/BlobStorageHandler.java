@@ -8,24 +8,14 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.implementation.models.StorageErrorException;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobStorageException;
-import com.azure.storage.blob.models.PublicAccessType;
-import com.azure.storage.blob.options.BlobContainerCreateOptions;
-import com.azure.storage.blob.sas.BlobContainerSasPermission;
-import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
 import com.azure.storage.common.StorageSharedKeyCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.herrljunga.astta.utils.AnalyzedCall;
 import se.herrljunga.astta.utils.Config;
 import se.herrljunga.astta.utils.GenerateSasToken;
 import se.herrljunga.astta.utils.Utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,12 +44,14 @@ public class BlobStorageHandler implements StorageHandler {
         this.blobContainerClient = blobServiceClient.getBlobContainerClient(blobContainerName);
     }
 
+
     public BlobStorageHandler(String endpoint, String sasToken, StorageSharedKeyCredential credential) {
         this.blobServiceClient = new BlobServiceClientBuilder()
                 .endpoint(endpoint)
                 .sasToken(sasToken)
                 .credential(credential)
                 .buildClient();
+
     }
 
 
@@ -100,7 +92,7 @@ public class BlobStorageHandler implements StorageHandler {
      * @param filePath The local file path of the file to be saved.
      */
     @Override
-    public void saveToStorage(String filePath) {
+    public void saveSingleFileToStorage(String filePath) {
         logger.info("Saving to storage: " + filePath);
         try {
             BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(filePath)); // Name of saved file
@@ -111,23 +103,35 @@ public class BlobStorageHandler implements StorageHandler {
         }
         logger.info("Done saving to storage: " + filePath);
     }
-
+    /**
+     * Saves a file to Azure Blob Storage
+     *
+     * @param analyzedCalls The local file path of the file to be saved.
+     */
+    @Override
+    public void saveToStorage(List<AnalyzedCall> analyzedCalls) {
+        for (var analyzedCall : analyzedCalls) {
+            saveSingleFileToStorage(analyzedCall.savePath());
+        }
+    }
     public void deleteContainer() {
         blobContainerClient.deleteIfExists();
     }
 
-    public void createTempContainer(String containerName) {
+    public BlobContainerClient createTempContainer(String containerName) {
+        BlobContainerClient newContainerClient = null;
         try {
             var response = blobServiceClient.createBlobContainerIfNotExistsWithResponse(containerName, null, Context.NONE);
-            BlobContainerClient newContainerClient= response.getValue();
+            newContainerClient= response.getValue();
             // Generate a SAS token with write rights for the new blob container
-            GenerateSasToken.generateSasToken(newContainerClient);
             Thread.sleep(500);
         } catch (BlobStorageException e) {
             System.err.println("Error creating new container: " + e.getMessage());
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        this.blobContainerClient = newContainerClient;
+        return newContainerClient;
     }
 
     /**

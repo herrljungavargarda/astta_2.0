@@ -1,9 +1,12 @@
 package se.herrljunga.astta.speechtotext;
 
+import com.azure.storage.common.StorageSharedKeyCredential;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
+import se.herrljunga.astta.filehandler.BlobStorageHandler;
+import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.keyvault.KeyVault;
 import se.herrljunga.astta.utils.Config;
 import se.herrljunga.astta.utils.GenerateSasToken;
@@ -12,12 +15,24 @@ import se.herrljunga.astta.utils.Utils;
 import java.io.IOException;
 
 public class BatchTranscriber {
+    private String speechToTextKey;
+    private String audioSourceContainerUrl;
+    private String destinationContainerUrl;
 
-    private static String speechToTextKey = KeyVault.getSecret(Config.speechToTextSecretName);
-    private static String audioSourceContainerUrl = KeyVault.getSecret(Config.blobStorageEndpoint) + "/" + Config.audioSourceContainerName + "?" + KeyVault.getSecret(Config.sasTokenSecretName);
-    private static String destinationContainerUrl = KeyVault.getSecret(Config.blobStorageEndpoint) + "/" + Config.transcriptionDestinationContainerName + "?" + GenerateSasToken.getTempContainerSasToken();
+    public BatchTranscriber(){
+        this.speechToTextKey = KeyVault.getSecret(Config.speechToTextSecretName);
+        this.audioSourceContainerUrl = KeyVault.getSecret(Config.blobStorageEndpoint) + "/" + Config.audioSourceContainerName + "?" + KeyVault.getSecret(Config.sasTokenSecretName);
 
-    public static void startTranscription() throws IOException, InterruptedException {
+
+        StorageHandler tempContainer = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+                KeyVault.getSecret(Config.sasTokenSecretName),
+                new StorageSharedKeyCredential(KeyVault.getSecret(Config.accountSecretName), KeyVault.getSecret(Config.accountSecretKey)));
+        var containerClient = tempContainer.createTempContainer(Config.transcriptionDestinationContainerName);
+        String sasToken = GenerateSasToken.generateSasToken(containerClient);
+        destinationContainerUrl = KeyVault.getSecret(Config.blobStorageEndpoint) + "/" + Config.transcriptionDestinationContainerName + "?" + sasToken;
+    }
+
+    public void startTranscription() throws IOException, InterruptedException {
         String response = batchTranscribe();
         String transcriptionUrl = Utils.getElementFromJson(response, "self");
         getTranscriptionStatus(transcriptionUrl);
@@ -28,7 +43,7 @@ public class BatchTranscriber {
         }
     }
 
-    private static String batchTranscribe() throws IOException {
+    private String batchTranscribe() throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         MediaType mediaType = MediaType.parse("application/json");
@@ -43,13 +58,14 @@ public class BatchTranscriber {
                 .addHeader("Content-Type", "application/json")
                 .build();
         try (Response response = client.newCall(request).execute();) {
+            assert response.body() != null;
             return response.body().string();
         }
 
     }
 
     @NotNull
-    private static JsonObject createRequestBody() {
+    private JsonObject createRequestBody() {
         JsonObject jsonBody = new JsonObject();
         jsonBody.addProperty("contentContainerUrl", audioSourceContainerUrl);
         jsonBody.addProperty("locale", "sv-SE");
@@ -67,7 +83,7 @@ public class BatchTranscriber {
         return jsonBody;
     }
 
-    private static String getTranscriptionStatusResponse(String transcriptionUrl) throws IOException {
+    private String getTranscriptionStatusResponse(String transcriptionUrl) throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         Request request = new Request.Builder()
@@ -76,21 +92,19 @@ public class BatchTranscriber {
                 .addHeader("Ocp-Apim-Subscription-Key", speechToTextKey)
                 .build();
         try (Response response = client.newCall(request).execute();) {
+            assert response.body() != null;
             return response.body().string();
         }
     }
 
     // Returns true if transcription is done
-    private static boolean getTranscriptionStatus(String transcriptionUrl) throws IOException {
+    private boolean getTranscriptionStatus(String transcriptionUrl) throws IOException {
         String statusResponse = getTranscriptionStatusResponse(transcriptionUrl);
         String status = Utils.getElementFromJson(statusResponse, "status");
-        switch (status) {
-            case "Succeeded":
-                return true;
-            case "Failed":
-                throw new RuntimeException("Failed transcription");
-            default:
-                return false;
-        }
+        return switch (status) {
+            case "Succeeded" -> true;
+            case "Failed" -> throw new RuntimeException("Failed transcription");
+            default -> false;
+        };
     }
 }

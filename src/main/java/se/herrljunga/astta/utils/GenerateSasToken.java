@@ -8,14 +8,15 @@ import java.time.OffsetDateTime;
 
 public class GenerateSasToken {
     static String tempContainerSasToken;
-    public static void generateSasToken(BlobContainerClient newContainerClient) {
+    public static String generateSasToken(BlobContainerClient newContainerClient) {
         BlobContainerSasPermission permissions = new BlobContainerSasPermission().setWritePermission(true);
         OffsetDateTime expiryTime = OffsetDateTime.now().plusDays(1);
         BlobServiceSasSignatureValues sasSignatureValues = new BlobServiceSasSignatureValues(expiryTime, permissions);
-        tempContainerSasToken = newContainerClient.generateSas(sasSignatureValues);
+        return newContainerClient.generateSas(sasSignatureValues);
     }
 
     public static String getTempContainerSasToken() {
+        System.out.println(tempContainerSasToken);
         return tempContainerSasToken;
     }
 }

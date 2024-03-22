@@ -3,6 +3,7 @@ package se.herrljunga.astta.utils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.herrljunga.astta.filehandler.StorageHandler;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioSystem;
@@ -12,9 +13,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Utils {
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
+
     /**
      * Creates a temporary directory to store temporary files.
      * If the directory already exists, its contents and the directory are deleted before creating a new e directory.
@@ -126,7 +130,6 @@ public class Utils {
      **/
 
 
-
     public static String createJson(String content, String duration, int tokensUsed) {
         logger.info("Creating and parsing json");
         try {
@@ -137,53 +140,57 @@ public class Utils {
             logger.info("Done creating and parsing json");
             return gson.toJson(jsonObject);
         } catch (JsonParseException e) {
-            logger.error("An error occurred when trying to parse Json." + e );
+            logger.error("An error occurred when trying to parse Json." + e);
             logger.error("Json: " + content);
             throw new RuntimeException("Exception thrown in Utils, createJson " + e.getMessage());
         }
     }
 
-    public static boolean validateJson(String jsonToValidate){
+    public static boolean validateJson(String jsonToValidate) {
 
-        try{
+        try {
             new Gson().fromJson(jsonToValidate, JsonObject.class);
             return true;
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             logger.error("Bad json string:\n" + jsonToValidate);
             return false;
         }
     }
 
     /**
-     * @param writePath the path to write to
-     * @param text      the content of the file
+     * @param analyzedCalls the calls to write to the file
      **/
-    public static void writeToFile(String writePath, String text) {
-        logger.info("Writing to file: " + writePath);
-        try {
-            FileWriter fileWriter = new FileWriter(writePath);
-            fileWriter.write(text);
-            fileWriter.flush();
-            fileWriter.close();
-            logger.info("Done writing to file: " + writePath);
-        } catch (IOException e) {
-            logger.error("An error occurred when trying to write to file." + e);
-            throw new RuntimeException("Exception thrown in Utils, writeToFile " + e.getMessage());
+    public static void writeToFile(List<AnalyzedCall> analyzedCalls) {
+        for (var analyzedCall : analyzedCalls) {
+            logger.info("Writing to file: " + analyzedCall.savePath());
+            try {
+                FileWriter fileWriter = new FileWriter(analyzedCall.savePath());
+                fileWriter.write(analyzedCall.analyzedCallJson());
+                fileWriter.flush();
+                fileWriter.close();
+                logger.info("Done writing to file: " + analyzedCall.savePath());
+            } catch (IOException e) {
+                logger.error("An error occurred when trying to write to file." + e);
+                throw new RuntimeException("Exception thrown in Utils, writeToFile " + e.getMessage());
+            }
         }
-    }
-
-    /**
-     * An overload of writeToFile() for writing analyzed calls to a file
-     *
-     * @param analyzedCall the call to write to the file
-     **/
-    public static void writeToFile(AnalyzedCall analyzedCall) {
-        writeToFile(analyzedCall.savePath(), analyzedCall.analyzedCallJson());
     }
 
     public static String getElementFromJson(String response, String elementToGet) {
         JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
         return jsonObject.get(elementToGet).getAsString();
+    }
+
+    public static List<String> extractReport(List<String> paths, StorageHandler reportFilePath) {
+        List<String> filteredPaths = new ArrayList<>();
+        for(var path: paths) {
+            if (path.contains("_report")) {
+                reportFilePath.saveSingleFileToStorage(path);
+            }
+            else if (!paths.contains("_report")) {
+                filteredPaths.add(path);
+            }
+        }
+        return filteredPaths;
     }
 }
