@@ -18,6 +18,7 @@ import se.herrljunga.astta.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+// TODO Separate to two classes, one for the entire blob, one for blob container
 
 /**
  * Implementation of the FetchSave interface for retrieving audio files from Azure Blob Storage.

@@ -24,9 +24,9 @@ public class App {
     static StorageHandler powerBiBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
             KeyVault.getSecret(Config.sasTokenSecretName),
             Config.powerBiContainerName);
-    static StorageHandler transcriptionDestinationBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+    static StorageHandler tempBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
             KeyVault.getSecret(Config.sasTokenSecretName),
-            Config.transcriptionDestinationContainerName);
+            Config.tempContainerName);
     static MultiThreadAnalyzer multiThreadAnalyzer = new MultiThreadAnalyzer(new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel));
     static BatchTranscriber batchTranscriber = new BatchTranscriber();
 
@@ -35,9 +35,9 @@ public class App {
         logger.debug("Starting logger");
         try {
             // Transcribe:
-            //batchTranscriber.startTranscription();
+            batchTranscriber.startTranscription();
 
-            List<String> transcribedPaths = transcriptionDestinationBlobStorage.fetchFile();
+            List<String> transcribedPaths = tempBlobStorage.fetchFile();
 
             List<String> filteredTranscribedPaths = Utils.extractReport(transcribedPaths, reportBlobStorage);
 
@@ -46,7 +46,6 @@ public class App {
             // Analyze:
             List<AnalyzedCall> analyzedCall = multiThreadAnalyzer.startAnalysis(transcribedCallInformations);
 
-            transcriptionDestinationBlobStorage.deleteContainer();
 
             // Fix JSON
             Utils.writeToFile(analyzedCall);
@@ -56,6 +55,7 @@ public class App {
             e.printStackTrace();
             logger.error("Exception occured: ", e);
         } finally {
+            tempBlobStorage.deleteContainer();
             System.exit(0);
         }
     }

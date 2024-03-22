@@ -27,9 +27,9 @@ public class BatchTranscriber {
         StorageHandler tempContainer = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
                 KeyVault.getSecret(Config.sasTokenSecretName),
                 new StorageSharedKeyCredential(KeyVault.getSecret(Config.accountSecretName), KeyVault.getSecret(Config.accountSecretKey)));
-        var containerClient = tempContainer.createTempContainer(Config.transcriptionDestinationContainerName);
+        var containerClient = tempContainer.createTempContainer(Config.tempContainerName);
         String sasToken = GenerateSasToken.generateSasToken(containerClient);
-        destinationContainerUrl = KeyVault.getSecret(Config.blobStorageEndpoint) + "/" + Config.transcriptionDestinationContainerName + "?" + sasToken;
+        destinationContainerUrl = KeyVault.getSecret(Config.blobStorageEndpoint) + "/" + Config.tempContainerName + "?" + sasToken;
     }
 
     // TODO ???? Convert to async ?????
