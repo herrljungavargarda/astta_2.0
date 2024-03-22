@@ -32,6 +32,7 @@ public class BatchTranscriber {
         destinationContainerUrl = KeyVault.getSecret(Config.blobStorageEndpoint) + "/" + Config.transcriptionDestinationContainerName + "?" + sasToken;
     }
 
+    // TODO ???? Convert to async ?????
     public void startTranscription() throws IOException, InterruptedException {
         String response = batchTranscribe();
         String transcriptionUrl = Utils.getElementFromJson(response, "self");
