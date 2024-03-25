@@ -33,7 +33,7 @@ public class App {
     static MultiThreadAnalyzer multiThreadAnalyzer = new MultiThreadAnalyzer(new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel));
     static BatchTranscriber batchTranscriber = new BatchTranscriber();
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) {
         Logger logger = LoggerFactory.getLogger(App.class);
         logger.debug("Starting logger");
         try {
@@ -46,7 +46,7 @@ public class App {
 
             List<TranscribedCallInformation> transcribedCallInformations = OpenAIAnalyzer.extractInformationFromTranscribedFiles(filteredTranscribedPaths);
 
-            // Analyze:
+            // Run the whole chain
             multiThreadAnalyzer.startAnalysis(transcribedCallInformations, powerBiBlobStorage, audioSource);
         } catch (Exception e) {
             e.printStackTrace();

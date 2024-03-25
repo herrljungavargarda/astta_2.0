@@ -80,6 +80,12 @@ public class OpenAIAnalyzer {
         }
     }
 
+    /**
+     * Get the analysis from the transcribed call
+     *
+     * @param transcribedCall The file to analys
+     * @return the analysis of the transcribed call
+     */
     @NotNull
     public AnalyzeResult getAnalyzeResult(TranscribedCallInformation transcribedCall) {
         AnalyzeResult analyzedCallResult;
@@ -97,7 +103,13 @@ public class OpenAIAnalyzer {
         return analyzedCallResult;
     }
 
-    public AnalyzedCall buildJsonFile(AnalyzeResult analyzedCallResult, TranscribedCallInformation transcribedCall) throws ExecutionException, InterruptedException {
+    /**
+     * Build json file out of the analyzed call
+     * @param analyzedCallResult the result of the analyzed call
+     * @param transcribedCall the transcribed call
+     * @return final result of the analyzed call in .json format
+     */
+    public AnalyzedCall buildJsonFile(AnalyzeResult analyzedCallResult, TranscribedCallInformation transcribedCall) {
         String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getCallDuration(), analyzedCallResult.tokensUsed());
         String analyzedCallJsonPath = Config.jsonSaveDirectory +    // The json save location folder
                 Utils.getFileName(transcribedCall.getPath()) // Adds the filename of the audiofile (removes path)
@@ -105,6 +117,12 @@ public class OpenAIAnalyzer {
         return new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
     }
 
+    /**
+     * Extracting the information needed from the transcribed file (json start at 10k lines)
+     *
+     * @param paths File name to extract data from
+     * @return a list of all extracted files in json format
+     */
     public static List<TranscribedCallInformation> extractInformationFromTranscribedFiles(List<String> paths) {
         List<TranscribedCallInformation> transcribedCalls = new ArrayList<>();
         try {

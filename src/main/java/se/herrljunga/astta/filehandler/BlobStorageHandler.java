@@ -27,7 +27,6 @@ public class BlobStorageHandler implements StorageHandler {
     BlobServiceClient blobServiceClient;
     BlobContainerClient blobContainerClient;
     List<String> blobFilePath = new ArrayList<>();
-    public String token;
     Logger logger = LoggerFactory.getLogger(BlobStorageHandler.class);
 
     /**
