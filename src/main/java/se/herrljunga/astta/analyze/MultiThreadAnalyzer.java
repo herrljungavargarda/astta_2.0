@@ -2,8 +2,10 @@ package se.herrljunga.astta.analyze;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.utils.AnalyzedCall;
 import se.herrljunga.astta.utils.TranscribedCallInformation;
+import se.herrljunga.astta.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,7 @@ public class MultiThreadAnalyzer {
      * @param transcribedCalls a list of transcribed calls to be analyzed
      */
 
-    public List<AnalyzedCall> startAnalysis(List<TranscribedCallInformation> transcribedCalls) {
+    public List<AnalyzedCall> startAnalysis(List<TranscribedCallInformation> transcribedCalls, StorageHandler powerBiBlobStorage, StorageHandler audioSource) {
         ExecutorService executorService = Executors.newCachedThreadPool();
         List<Future<?>> futures = new ArrayList<>();
 
@@ -40,6 +42,9 @@ public class MultiThreadAnalyzer {
                 try {
                     AnalyzeResult analyzedCallResult = analyzer.getAnalyzeResult(call);
                     analyzedCalls.add(analyzer.buildJsonFile(analyzedCallResult, call));
+                    powerBiBlobStorage.saveSingleFileToStorage(analyzer.buildJsonFile(analyzedCallResult, call).savePath());
+                    audioSource.deleteFromStorage(Utils.getFileName(analyzer.buildJsonFile(analyzedCallResult, call).savePath()));
+                    //System.out.println(analyzer.buildJsonFile(analyzedCallResult, call).savePath());
                 } catch (ExecutionException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -52,7 +57,7 @@ public class MultiThreadAnalyzer {
             try {
                 future.get();
             } catch (InterruptedException | ExecutionException e) {
-                logger.error("An error occurred when reading prompt.txt: " + e.getMessage());
+                logger.error("An error occurred when waiting for tasks to complete: " + e.getMessage());
                 throw new RuntimeException("Exception thrown in OpenAiAnalyzer, analyze " + e.getMessage());
             }
         }

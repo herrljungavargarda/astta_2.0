@@ -103,9 +103,8 @@ public class BatchTranscriber {
         String statusResponse = getTranscriptionStatusResponse(transcriptionUrl);
         String status = Utils.getElementFromJson(statusResponse, "status");
         return switch (status) {
-            case "Succeeded" -> true;
-            case "Failed" -> throw new RuntimeException("Failed transcription");
-            default -> false;
+            case "Running" -> false;
+            default -> true;
         };
     }
 }

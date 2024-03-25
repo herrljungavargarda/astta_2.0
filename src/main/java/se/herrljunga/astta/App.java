@@ -27,6 +27,9 @@ public class App {
     static StorageHandler tempBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
             KeyVault.getSecret(Config.sasTokenSecretName),
             Config.tempContainerName);
+    static StorageHandler audioSource = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
+            KeyVault.getSecret(Config.sasTokenSecretName),
+            Config.audioSourceContainerName);
     static MultiThreadAnalyzer multiThreadAnalyzer = new MultiThreadAnalyzer(new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel));
     static BatchTranscriber batchTranscriber = new BatchTranscriber();
 
@@ -44,13 +47,7 @@ public class App {
             List<TranscribedCallInformation> transcribedCallInformations = OpenAIAnalyzer.extractInformationFromTranscribedFiles(filteredTranscribedPaths);
 
             // Analyze:
-            List<AnalyzedCall> analyzedCall = multiThreadAnalyzer.startAnalysis(transcribedCallInformations);
-
-
-            // Fix JSON
-            Utils.writeToFile(analyzedCall);
-
-            powerBiBlobStorage.saveToStorage(analyzedCall); //src/main/temp/file.json
+            multiThreadAnalyzer.startAnalysis(transcribedCallInformations, powerBiBlobStorage, audioSource);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Exception occured: ", e);

@@ -72,7 +72,7 @@ public class OpenAIAnalyzer {
             }
             CompletionsUsage usage = chatCompletions.getUsage();
 
-            logger.info("Analysis completed successfully. Total tokens used: " + usage.getTotalTokens());
+            logger.info("Analysis of " + Utils.removePathFromFilename(transcribedCallInformation.getPath()) + " completed successfully. Total tokens used: " + usage.getTotalTokens());
             return new AnalyzeResult(sb.toString(), usage.getTotalTokens());
         } catch (IOException e) {
             logger.error("An error occurred when reading prompt.txt: " + e.getMessage());

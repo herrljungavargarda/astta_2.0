@@ -92,8 +92,9 @@ public class Utils {
      **/
     public static String getFileName(String path) {
         String[] splitPath = path.split("/");
-        String[] splitFileType = splitPath[splitPath.length - 1].split("\\.");
-        return splitFileType[0];
+        int lastIndex = splitPath[splitPath.length - 1].lastIndexOf(".");
+        // Extract substring before the last "."
+        return splitPath[splitPath.length - 1].substring(0, lastIndex);
     }
 
     /**
