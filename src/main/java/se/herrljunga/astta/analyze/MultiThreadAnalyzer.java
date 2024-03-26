@@ -44,8 +44,7 @@ public class MultiThreadAnalyzer {
                     analyzedCalls.add(analyzer.buildJsonFile(analyzedCallResult, call));
                     powerBiBlobStorage.saveSingleFileToStorage(analyzer.buildJsonFile(analyzedCallResult, call).savePath());
                     audioSource.deleteFromStorage(Utils.getFileName(analyzer.buildJsonFile(analyzedCallResult, call).savePath()));
-                    //System.out.println(analyzer.buildJsonFile(analyzedCallResult, call).savePath());
-                } catch (ExecutionException | InterruptedException e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             });
