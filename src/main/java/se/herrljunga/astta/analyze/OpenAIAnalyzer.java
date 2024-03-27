@@ -27,7 +27,6 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
@@ -46,12 +45,25 @@ public class OpenAIAnalyzer {
      * @param deploymentOrModelId The deployment or model ID to interact with.
      */
     public OpenAIAnalyzer(String openAiKey, String openAiEndpoint, String deploymentOrModelId) {
+
+        RetryPolicy retryPolicy = new RetryPolicy(new RetryStrategy() {
+            @Override
+            public Duration calculateRetryDelay(int retryAttempts) {
+                return Duration.ofSeconds(10); // Set the delay to 120 seconds
+            }
+
+            @Override
+            public int getMaxRetries() {
+                return 3; // Set the maximum number of retry attempts to 3
+            }
+        });
+
         // Create a custom HttpClient with a modified timeout
         HttpClient httpClient = new NettyAsyncHttpClientBuilder()
                 .responseTimeout(Duration.ofMinutes(2))
                 .build();
 
-        this.client = new OpenAIClientBuilder().credential(new AzureKeyCredential(openAiKey)).endpoint(openAiEndpoint).httpClient(httpClient).buildClient();
+        this.client = new OpenAIClientBuilder().credential(new AzureKeyCredential(openAiKey)).endpoint(openAiEndpoint).httpClient(httpClient).retryPolicy(retryPolicy).buildClient();
         this.deploymentOrModelId = deploymentOrModelId;
         logger.info("OpenAIAnalyzer initialized with deployment/model ID: " + deploymentOrModelId);
     }
@@ -121,10 +133,12 @@ public class OpenAIAnalyzer {
      */
     public AnalyzedCall buildJsonFile(AnalyzeResult analyzedCallResult, TranscribedCallInformation transcribedCall) {
         String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getCallDuration(), analyzedCallResult.tokensUsed());
-        String analyzedCallJsonPath = Config.jsonSaveDirectory +    // The json save location folder
+        String analyzedCallJsonPath = Config.analyzedJsonSaveDirectory +    // The json save location folder
                 Utils.getFileName(transcribedCall.getPath()) // Adds the filename of the audiofile (removes path)
-                + ".json"; // Make it a json file
-        return new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
+                + ".analyzed.json"; // Make it a json file
+        AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
+        Utils.writeToFile(analyzedCall);
+        return analyzedCall;
     }
 
     /**

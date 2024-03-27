@@ -21,13 +21,15 @@ public class Config {
     //OpenAI
     public static String openaiSecretName = "openaikey"; // Your secret key, (can be found when signed in to Azure Portal under Azure OpenAi, Keys and Endpoint)
     public static String openaiEndpoint = "openaiendpoint"; // Your endpoint, (can be found when signed in to Azure Portal under Azure OpenAi, Keys and Endpoint)
-    public static String openaiModel = "testGpt4"; // Your AI model, (can be found and set up when signed in to Azure Portal under Azure OpenAi, Model deployments)
+    public static String openaiModel = "test"; // Your AI model, (can be found and set up when signed in to Azure Portal under Azure OpenAi, Model deployments)
 
     //Utils
     public static String pathToTemp = "src/main/temp/";
-    public static String jsonSaveDirectory = "src/main/temp/";
+    public static String analyzedJsonSaveDirectory = "src/main/temp/";
     public static String transcribedTextSaveDirectory = "src/main/temp/";
     public static String sasTokenTranscriptionBlobSecretName = "sasTokenTranscriptionBlob";
 
     public static String transcriptionApiUrl = "https://swedencentral.api.cognitive.microsoft.com/speechtotext/v3.1/transcriptions/";
+
+    public static int maxThreadsForAnalysis = 60; //60 threads stress tested with gpt-35-turbo with 50k TPM limit
 }

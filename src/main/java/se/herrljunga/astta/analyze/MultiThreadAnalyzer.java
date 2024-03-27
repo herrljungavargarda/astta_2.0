@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.utils.AnalyzedCall;
+import se.herrljunga.astta.utils.Config;
 import se.herrljunga.astta.utils.TranscribedCallInformation;
 import se.herrljunga.astta.utils.Utils;
 
@@ -32,7 +33,7 @@ public class MultiThreadAnalyzer {
      */
 
     public List<AnalyzedCall> startAnalysis(List<TranscribedCallInformation> transcribedCalls, StorageHandler powerBiBlobStorage, StorageHandler audioSource) {
-        ExecutorService executorService = Executors.newFixedThreadPool(15);
+        ExecutorService executorService = Executors.newFixedThreadPool(Config.maxThreadsForAnalysis);
         List<Future<?>> futures = new ArrayList<>();
 
         List<AnalyzedCall> analyzedCalls = new ArrayList<>();
@@ -42,6 +43,7 @@ public class MultiThreadAnalyzer {
             Future<?> future = executorService.submit(() -> {
                 try {
                     AnalyzeResult analyzedCallResult = analyzer.getAnalyzeResult(call);
+
                     analyzedCalls.add(analyzer.buildJsonFile(analyzedCallResult, call));
                     powerBiBlobStorage.saveSingleFileToStorage(analyzer.buildJsonFile(analyzedCallResult, call).savePath());
                     //audioSource.deleteFromStorage(Utils.getFileName(analyzer.buildJsonFile(analyzedCallResult, call).savePath()));

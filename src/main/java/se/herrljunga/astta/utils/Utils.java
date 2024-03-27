@@ -153,7 +153,7 @@ public class Utils {
             new Gson().fromJson(jsonToValidate, JsonObject.class);
             return true;
         } catch (Exception e) {
-            logger.error("Bad json string:\n" + jsonToValidate);
+            logger.warn("Bad json string:\n" + jsonToValidate);
             return false;
         }
     }
@@ -163,17 +163,21 @@ public class Utils {
      **/
     public static void writeToFile(List<AnalyzedCall> analyzedCalls) {
         for (var analyzedCall : analyzedCalls) {
-            logger.info("Writing to file: " + analyzedCall.savePath());
-            try {
-                FileWriter fileWriter = new FileWriter(analyzedCall.savePath());
-                fileWriter.write(analyzedCall.analyzedCallJson());
-                fileWriter.flush();
-                fileWriter.close();
-                logger.info("Done writing to file: " + analyzedCall.savePath());
-            } catch (IOException e) {
-                logger.error("An error occurred when trying to write to file." + e);
-                throw new RuntimeException("Exception thrown in Utils, writeToFile " + e.getMessage());
-            }
+            writeToFile(analyzedCall);
+        }
+    }
+
+    public static void writeToFile(AnalyzedCall analyzedCall) {
+        logger.info("Writing to file: " + analyzedCall.savePath());
+        try {
+            FileWriter fileWriter = new FileWriter(analyzedCall.savePath());
+            fileWriter.write(analyzedCall.analyzedCallJson());
+            fileWriter.flush();
+            fileWriter.close();
+            logger.info("Done writing to file: " + analyzedCall.savePath());
+        } catch (IOException e) {
+            logger.error("An error occurred when trying to write to file." + e);
+            throw new RuntimeException("Exception thrown in Utils, writeToFile " + e.getMessage());
         }
     }
 

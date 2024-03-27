@@ -18,6 +18,10 @@ import se.herrljunga.astta.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 // TODO Separate to two classes, one for the entire blob, one for blob container
 
 /**
@@ -64,28 +68,42 @@ public class BlobStorageHandler implements StorageHandler {
     @Override
     public List<String> fetchFile() {
         logger.info("Fetching files");
-        try {
-            List<String> paths = new ArrayList<>();
-            Utils.createTempDirectory();
-            for (BlobItem blobItem : blobContainerClient.listBlobs()) {
-                // Retrieve file title
-                String blobName = blobItem.getName();
-                logger.info("Fetching file: " + blobName);
-                // blobName - Adding the same name as the file in Blob Storage
-                BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
-                blobFilePath.add(blobName);
-                blobClient.downloadToFile(Config.pathToTemp + Utils.removePathFromFilename(blobName));
-                paths.add(Config.pathToTemp + Utils.removePathFromFilename(blobName));
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        List<Future<?>> futures = new ArrayList<>();
+        List<String> paths = new ArrayList<>();
+        Utils.createTempDirectory();
+        for (BlobItem blobItem : blobContainerClient.listBlobs()) {
+        Future<?> future = executorService.submit(() -> {
+            try {
+                    // Retrieve file title
+                    String blobName = blobItem.getName();
+                    logger.info("Fetching file: " + blobName);
+                    // blobName - Adding the same name as the file in Blob Storage
+                    BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
+                    blobFilePath.add(blobName);
+                    blobClient.downloadToFile(Config.pathToTemp + Utils.removePathFromFilename(blobName));
+                    paths.add(Config.pathToTemp + Utils.removePathFromFilename(blobName));
+                    logger.info("Done fetching file: " + Utils.removePathFromFilename(blobName));
+                } catch (BlobStorageException | StorageErrorException e) {
+                    System.err.println("An error fetching files from blob");
+                    throw new RuntimeException("Exception thrown in BlobStorageHandler, fetchFile " + e.getMessage());
             }
-            logger.info("Done fetching files");
-
-            return paths;
-        } catch (BlobStorageException | StorageErrorException e) {
-            System.err.println("An error fetching files from blob");
-            throw new RuntimeException("Exception thrown in BlobStorageHandler, fetchFile " + e.getMessage());
-        }
+        });
+        futures.add(future);
     }
-
+        // Wait for all tasks to complete
+        for (Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error("An error occurred when waiting for tasks to complete: " + e.getMessage());
+                throw new RuntimeException("Exception thrown in OpenAiAnalyzer, analyze " + e.getMessage());
+            }
+        }
+        executorService.shutdown(); // Always remember to shutdown the executor service
+        logger.info("Done fetching files");
+        return paths;
+    }
     /**
      * Saves a file to Azure Blob Storage
      *
