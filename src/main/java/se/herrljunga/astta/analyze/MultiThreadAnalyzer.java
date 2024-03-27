@@ -32,10 +32,11 @@ public class MultiThreadAnalyzer {
      */
 
     public List<AnalyzedCall> startAnalysis(List<TranscribedCallInformation> transcribedCalls, StorageHandler powerBiBlobStorage, StorageHandler audioSource) {
-        ExecutorService executorService = Executors.newCachedThreadPool();
+        ExecutorService executorService = Executors.newFixedThreadPool(15);
         List<Future<?>> futures = new ArrayList<>();
 
         List<AnalyzedCall> analyzedCalls = new ArrayList<>();
+
 
         for (var call : transcribedCalls) {
             Future<?> future = executorService.submit(() -> {
@@ -43,8 +44,9 @@ public class MultiThreadAnalyzer {
                     AnalyzeResult analyzedCallResult = analyzer.getAnalyzeResult(call);
                     analyzedCalls.add(analyzer.buildJsonFile(analyzedCallResult, call));
                     powerBiBlobStorage.saveSingleFileToStorage(analyzer.buildJsonFile(analyzedCallResult, call).savePath());
-                    audioSource.deleteFromStorage(Utils.getFileName(analyzer.buildJsonFile(analyzedCallResult, call).savePath()));
+                    //audioSource.deleteFromStorage(Utils.getFileName(analyzer.buildJsonFile(analyzedCallResult, call).savePath()));
                 } catch (Exception e) {
+                    logger.error("An error occurred when analysing the file: " + Utils.removePathFromFilename(call.getPath()) + "\n" + e.getMessage());
                     throw new RuntimeException(e);
                 }
             });

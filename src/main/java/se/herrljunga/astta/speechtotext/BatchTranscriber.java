@@ -42,6 +42,7 @@ public class BatchTranscriber {
             System.out.print("֍");
             Thread.sleep(5000);
         }
+        System.out.println("\n");
     }
 
     private String batchTranscribe() throws IOException {

@@ -4,6 +4,10 @@ import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.ai.openai.models.*;
 import com.azure.core.credential.AzureKeyCredential;
+import com.azure.core.http.HttpClient;
+import com.azure.core.http.netty.NettyAsyncHttpClientBuilder;
+import com.azure.core.http.policy.RetryPolicy;
+import com.azure.core.http.policy.RetryStrategy;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -20,6 +24,7 @@ import se.herrljunga.astta.utils.Utils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -41,7 +46,12 @@ public class OpenAIAnalyzer {
      * @param deploymentOrModelId The deployment or model ID to interact with.
      */
     public OpenAIAnalyzer(String openAiKey, String openAiEndpoint, String deploymentOrModelId) {
-        this.client = new OpenAIClientBuilder().credential(new AzureKeyCredential(openAiKey)).endpoint(openAiEndpoint).buildClient();
+        // Create a custom HttpClient with a modified timeout
+        HttpClient httpClient = new NettyAsyncHttpClientBuilder()
+                .responseTimeout(Duration.ofMinutes(2))
+                .build();
+
+        this.client = new OpenAIClientBuilder().credential(new AzureKeyCredential(openAiKey)).endpoint(openAiEndpoint).httpClient(httpClient).buildClient();
         this.deploymentOrModelId = deploymentOrModelId;
         logger.info("OpenAIAnalyzer initialized with deployment/model ID: " + deploymentOrModelId);
     }
