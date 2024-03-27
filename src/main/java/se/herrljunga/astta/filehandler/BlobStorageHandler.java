@@ -111,7 +111,7 @@ public class BlobStorageHandler implements StorageHandler {
      */
     @Override
     public void saveSingleFileToStorage(String filePath) {
-        logger.info("Saving to storage: " + filePath);
+        logger.info("Saving to storage: " + Utils.removePathFromFilename(filePath));
         try {
             BlobClient blobClient = blobContainerClient.getBlobClient(Utils.removePathFromFilename(filePath)); // Name of saved file
             blobClient.uploadFromFile(filePath, true);
