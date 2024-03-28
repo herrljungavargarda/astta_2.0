@@ -74,8 +74,10 @@ public class BatchTranscriber {
         jsonBody.addProperty("displayName", "My Transcription");
 
         JsonObject properties = new JsonObject();
-        properties.addProperty("wordLevelTimestampsEnabled", true);
+        //properties.addProperty("wordLevelTimestampsEnabled", true);
         properties.addProperty("destinationContainerUrl", destinationContainerUrl);
+        properties.addProperty("diarizationEnabled", true);
+        properties.addProperty("timeToLive", "PT12H");
 
         JsonObject languageIdentification = new JsonObject();
         languageIdentification.add("candidateLocales", new Gson().toJsonTree(new String[]{"sv-SE", "en-US"}));

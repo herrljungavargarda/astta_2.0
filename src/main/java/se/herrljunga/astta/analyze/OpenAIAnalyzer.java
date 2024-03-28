@@ -79,7 +79,7 @@ public class OpenAIAnalyzer {
      */
     public AnalyzeResult analyze(TranscribedCallInformation transcribedCallInformation) {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
-        String filePath = "src/main/resources/prompt.txt";
+        String filePath = "src/main/resources/promptWithoutAgent.txt";
         try {
             String mainPrompt = Files.readAllLines(Paths.get(filePath)).stream().collect(Collectors.joining(System.lineSeparator()));
             chatMessages.add(new ChatRequestSystemMessage("Before continuing, REMOVE OLD CACHE."));
@@ -132,7 +132,7 @@ public class OpenAIAnalyzer {
      * @return final result of the analyzed call in .json format
      */
     public AnalyzedCall buildJsonFile(AnalyzeResult analyzedCallResult, TranscribedCallInformation transcribedCall) {
-        String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getCallDuration(), analyzedCallResult.tokensUsed());
+        String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getCallDuration(), analyzedCallResult.tokensUsed(), transcribedCall.getPath());
         String analyzedCallJsonPath = Config.analyzedJsonSaveDirectory +    // The json save location folder
                 Utils.getFileName(transcribedCall.getPath()) // Adds the filename of the audiofile (removes path)
                 + ".analyzed.json"; // Make it a json file

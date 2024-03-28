@@ -3,6 +3,7 @@ package se.herrljunga.astta.utils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.herrljunga.astta.analyze.GetAgentName;
 import se.herrljunga.astta.filehandler.StorageHandler;
 
 import javax.sound.sampled.AudioFileFormat;
@@ -131,12 +132,13 @@ public class Utils {
      **/
 
 
-    public static String createJson(String content, String duration, int tokensUsed) {
+    public static String createJson(String content, String duration, int tokensUsed, String path) {
         logger.info("Creating and parsing json");
         try {
             JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
             jsonObject.addProperty("FileLength", duration);
             jsonObject.addProperty("TokensUsed", tokensUsed);
+            jsonObject.addProperty("AgentName", GetAgentName.getAgentName(path));
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             logger.info("Done creating and parsing json");
             return gson.toJson(jsonObject);
