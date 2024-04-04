@@ -38,7 +38,7 @@ public class App {
         logger.debug("Starting logger");
         try {
             // Transcribe:
-            //batchTranscriber.startTranscription();
+            batchTranscriber.startTranscription();
 
             List<String> transcribedPaths = tempBlobStorage.fetchFile();
 
@@ -52,7 +52,7 @@ public class App {
             e.printStackTrace();
             logger.error("Exception occured: ", e);
         } finally {
-            //tempBlobStorage.deleteContainer();
+            tempBlobStorage.deleteContainer();
             System.exit(0);
         }
     }

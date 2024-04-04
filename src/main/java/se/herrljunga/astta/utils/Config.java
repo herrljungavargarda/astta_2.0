@@ -32,5 +32,5 @@ public class Config {
     public static String transcriptionApiUrl = "https://swedencentral.api.cognitive.microsoft.com/speechtotext/v3.1/transcriptions/";
     public static String transcriptionsApiUrlPreview = "https://swedencentral.api.cognitive.microsoft.com/speechtotext/v3.2-preview.2/transcriptions/";
 
-    public static int maxThreadsForAnalysis = 60; //Stress testes (100 files avg length 7min): 60 threads with gpt-35-turbo with 50k TPM limit. 15 threads with gpt-4 with 10k TPM limit.
+    public static int maxThreadsForAnalysis = 60; //Stress testes (100 files avg length 7min): 60 threads with gpt-35-turbo with 50k TPM limit. 15 threads with gpt-4 with 10k TPM limit. (Run your own tests to see where it's stable)
 }

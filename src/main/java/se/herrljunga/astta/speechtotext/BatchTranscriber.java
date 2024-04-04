@@ -5,6 +5,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import se.herrljunga.astta.App;
 import se.herrljunga.astta.filehandler.BlobStorageHandler;
 import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.keyvault.KeyVault;
@@ -18,6 +21,7 @@ public class BatchTranscriber {
     private String speechToTextKey;
     private String audioSourceContainerUrl;
     private String destinationContainerUrl;
+    Logger logger = LoggerFactory.getLogger(App.class);
 
     public BatchTranscriber(){
         this.speechToTextKey = KeyVault.getSecret(Config.speechToTextSecretName);
@@ -33,7 +37,8 @@ public class BatchTranscriber {
     }
 
     // TODO ???? Convert to async ?????
-    public void startTranscription() throws IOException, InterruptedException {
+    public void startTranscription() {
+        try {
         String response = batchTranscribe();
         String transcriptionUrl = Utils.getElementFromJson(response, "self");
         getTranscriptionStatus(transcriptionUrl);
@@ -43,9 +48,13 @@ public class BatchTranscriber {
             Thread.sleep(5000);
         }
         System.out.println("\n");
+        }
+        catch (IOException | InterruptedException e) {
+            logger.error("Error while transcribing files" + e.getMessage());
+        }
     }
 
-    private String batchTranscribe() throws IOException {
+    private String batchTranscribe() throws IOException{
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         MediaType mediaType = MediaType.parse("application/json");
@@ -63,7 +72,6 @@ public class BatchTranscriber {
             assert response.body() != null;
             return response.body().string();
         }
-
     }
 
     @NotNull
@@ -76,7 +84,7 @@ public class BatchTranscriber {
         JsonObject properties = new JsonObject();
         //properties.addProperty("wordLevelTimestampsEnabled", true);
         properties.addProperty("destinationContainerUrl", destinationContainerUrl);
-        properties.addProperty("diarizationEnabled", true);
+        properties.addProperty("diarizationEnabled", false);
         properties.addProperty("timeToLive", "PT12H");
 
         JsonObject languageIdentification = new JsonObject();
