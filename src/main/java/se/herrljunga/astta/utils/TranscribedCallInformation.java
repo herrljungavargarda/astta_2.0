@@ -1,9 +1,13 @@
 package se.herrljunga.astta.utils;
 
-/**
- * A class representing transcribed text along with its associated language.
- */
 
+/**
+ * The TranscribedCallInformation class.
+ *
+ * This class represents transcribed text along with its associated call duration and path.
+ * It includes getter and setter methods for the transcribed text, call duration, and path.
+ * It also overrides the toString method to return the path.
+ */
 public class TranscribedCallInformation {
 
 
