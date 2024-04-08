@@ -1,5 +1,6 @@
 package se.herrljunga.astta.speechtotext;
 
+
 import com.azure.storage.common.StorageSharedKeyCredential;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -23,7 +24,7 @@ public class BatchTranscriber {
     private String destinationContainerUrl;
     Logger logger = LoggerFactory.getLogger(App.class);
 
-    public BatchTranscriber(){
+    public BatchTranscriber() {
         this.speechToTextKey = KeyVault.getSecret(Config.speechToTextSecretName);
         this.audioSourceContainerUrl = KeyVault.getSecret(Config.blobStorageEndpoint) + "/" + Config.audioSourceContainerName + "?" + KeyVault.getSecret(Config.sasTokenSecretName);
 
@@ -36,25 +37,24 @@ public class BatchTranscriber {
         destinationContainerUrl = KeyVault.getSecret(Config.blobStorageEndpoint) + "/" + Config.tempContainerName + "?" + sasToken;
     }
 
-    // TODO ???? Convert to async ?????
     public void startTranscription() {
         try {
-        String response = batchTranscribe();
-        String transcriptionUrl = Utils.getElementFromJson(response, "self");
-        getTranscriptionStatus(transcriptionUrl);
-        System.out.print("Transcribing ");
-        while (!getTranscriptionStatus(transcriptionUrl)) {
-            System.out.print("֍");
-            Thread.sleep(5000);
-        }
-        System.out.println("\n");
-        }
-        catch (IOException | InterruptedException e) {
-            logger.error("Error while transcribing files" + e.getMessage());
+            String response = batchTranscribe();
+            String transcriptionUrl = Utils.getElementFromJson(response, "self");
+            getTranscriptionStatus(transcriptionUrl);
+            System.out.print("Transcribing ");
+            while (!getTranscriptionStatus(transcriptionUrl)) {
+                System.out.print("֍");
+                Thread.sleep(5000);
+            }
+            System.out.println("\n");
+        } catch (InterruptedException e) {
+            logger.error("Error while transcribing files{}", e.getMessage());
+            throw new RuntimeException("Exception thrown in BatchTranscriber, startTranscription() " + e.getMessage());
         }
     }
 
-    private String batchTranscribe() throws IOException{
+    private String batchTranscribe() {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         MediaType mediaType = MediaType.parse("application/json");
@@ -71,6 +71,9 @@ public class BatchTranscriber {
         try (Response response = client.newCall(request).execute();) {
             assert response.body() != null;
             return response.body().string();
+        } catch (IOException e) {
+            logger.error("An error occurred when transcribing: {}", e.getMessage());
+            throw new RuntimeException("Exception thrown in BatchTranscriber, batchTranscribe " + e.getMessage());
         }
     }
 
@@ -82,7 +85,7 @@ public class BatchTranscriber {
         jsonBody.addProperty("displayName", "My Transcription");
 
         JsonObject properties = new JsonObject();
-        //properties.addProperty("wordLevelTimestampsEnabled", true);
+        properties.addProperty("wordLevelTimestampsEnabled", false);
         properties.addProperty("destinationContainerUrl", destinationContainerUrl);
         properties.addProperty("diarizationEnabled", false);
         properties.addProperty("timeToLive", "PT12H");
@@ -95,7 +98,7 @@ public class BatchTranscriber {
         return jsonBody;
     }
 
-    private String getTranscriptionStatusResponse(String transcriptionUrl) throws IOException {
+    private String getTranscriptionStatusResponse(String transcriptionUrl) {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         Request request = new Request.Builder()
@@ -103,14 +106,17 @@ public class BatchTranscriber {
                 .method("GET", null)
                 .addHeader("Ocp-Apim-Subscription-Key", speechToTextKey)
                 .build();
-        try (Response response = client.newCall(request).execute();) {
+        try (Response response = client.newCall(request).execute()) {
             assert response.body() != null;
             return response.body().string();
+        } catch (IOException e) {
+            logger.error("An error occurred when getting transcription status: {}", e.getMessage());
+            throw new RuntimeException("Exception thrown in BatchTranscriber, getTranscriptionStatusResponse " + e.getMessage());
         }
     }
 
     // Returns true if transcription is done
-    private boolean getTranscriptionStatus(String transcriptionUrl) throws IOException {
+    private boolean getTranscriptionStatus(String transcriptionUrl) {
         String statusResponse = getTranscriptionStatusResponse(transcriptionUrl);
         String status = Utils.getElementFromJson(statusResponse, "status");
         return switch (status) {

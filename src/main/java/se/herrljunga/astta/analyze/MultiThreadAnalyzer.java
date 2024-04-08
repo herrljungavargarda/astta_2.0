@@ -38,7 +38,6 @@ public class MultiThreadAnalyzer {
 
         List<AnalyzedCall> analyzedCalls = new ArrayList<>();
 
-
         for (var call : transcribedCalls) {
             Future<?> future = executorService.submit(() -> {
                 try {
@@ -48,7 +47,7 @@ public class MultiThreadAnalyzer {
                     powerBiBlobStorage.saveSingleFileToStorage(analyzer.buildJsonFile(analyzedCallResult, call).savePath());
                     //audioSource.deleteFromStorage(Utils.getFileName(analyzer.buildJsonFile(analyzedCallResult, call).savePath()));
                 } catch (Exception e) {
-                    logger.error("An error occurred when analysing the file: " + Utils.removePathFromFilename(call.getPath()) + "\n" + e.getMessage());
+                    logger.error("An error occurred when analysing the file: {}\n{}", Utils.removePathFromFilename(call.getPath()), e.getMessage());
                     throw new RuntimeException(e);
                 }
             });
@@ -60,11 +59,11 @@ public class MultiThreadAnalyzer {
             try {
                 future.get();
             } catch (InterruptedException | ExecutionException e) {
-                logger.error("An error occurred when waiting for tasks to complete: " + e.getMessage());
+                logger.error("An error occurred when waiting for tasks to complete: {}", e.getMessage());
                 throw new RuntimeException("Exception thrown in OpenAiAnalyzer, analyze " + e.getMessage());
             }
         }
-        executorService.shutdown(); // Always remember to shutdown the executor service
+        executorService.shutdown(); // Always remember to shut down the executor service
         return analyzedCalls;
     }
 

@@ -66,7 +66,7 @@ public class Utils {
                 });
                 logger.info("Temp directory deleted.");
             } catch (IOException e) {
-                logger.error("An error occurred when trying to delete directory." + e);
+                logger.error("An error occurred when trying to delete directory.{}", e);
                 throw new RuntimeException("Exception thrown in Utils, deleteFolderIfExists " + e.getMessage());
             }
         }
@@ -113,10 +113,10 @@ public class Utils {
             long audioFileLength = audioFile.length();
             int frameSize = format.getFormat().getFrameSize();
             float frameRate = format.getFormat().getFrameRate();
-            logger.info("Done calculating audio file duration: " + audioFileLength / (frameSize * frameRate));
+            logger.info("Done calculating audio file duration: {}", audioFileLength / (frameSize * frameRate));
             return audioFileLength / (frameSize * frameRate);
         } catch (UnsupportedAudioFileException | IOException e) {
-            logger.error("An error occurred when trying to get audio file duration." + e);
+            logger.error("An error occurred when trying to get audio file duration.{}", e.getMessage());
             throw new RuntimeException("Exception thrown in Utils, getAudioDuration " + e.getMessage());
         }
     }
@@ -143,8 +143,8 @@ public class Utils {
             logger.info("Done creating and parsing json");
             return gson.toJson(jsonObject);
         } catch (JsonParseException e) {
-            logger.error("An error occurred when trying to parse Json." + e);
-            logger.error("Json: " + content);
+            logger.error("An error occurred when trying to parse Json.{}", e.getMessage());
+            logger.error("Json: {}", content);
             throw new RuntimeException("Exception thrown in Utils, createJson " + e.getMessage());
         }
     }
@@ -155,7 +155,7 @@ public class Utils {
             new Gson().fromJson(jsonToValidate, JsonObject.class);
             return true;
         } catch (Exception e) {
-            logger.warn("Bad json string:\n" + jsonToValidate);
+            logger.warn("Bad json string:\n{}", jsonToValidate);
             return false;
         }
     }
@@ -170,29 +170,36 @@ public class Utils {
     }
 
     public static void writeToFile(AnalyzedCall analyzedCall) {
-        logger.info("Writing to file: " + analyzedCall.savePath());
+        logger.info("Writing to file: {}", analyzedCall.savePath());
         try {
             FileWriter fileWriter = new FileWriter(analyzedCall.savePath());
             fileWriter.write(analyzedCall.analyzedCallJson());
             fileWriter.flush();
             fileWriter.close();
-            logger.info("Done writing to file: " + analyzedCall.savePath());
+            logger.info("Done writing to file: {}", analyzedCall.savePath());
         } catch (IOException e) {
-            logger.error("An error occurred when trying to write to file." + e);
+            logger.error("An error occurred when trying to write to file.{}", e);
             throw new RuntimeException("Exception thrown in Utils, writeToFile " + e.getMessage());
         }
     }
 
     public static String getElementFromJson(String response, String elementToGet) {
+        try{
         JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
         return jsonObject.get(elementToGet).getAsString();
+        }
+        catch (JsonSyntaxException e){
+            logger.error("An error occurred when extracting {} from Json file \n{} \n{}", elementToGet, response, e.getMessage());
+            throw new RuntimeException("Exception thrown in Utils, writeToFile " + e.getMessage());
+        }
     }
 
-    public static List<String> extractReport(List<String> paths, StorageHandler reportFilePath) {
+    public static List<String> extractReport(List<String> paths, StorageHandler reportBlobHandler) {
         List<String> filteredPaths = new ArrayList<>();
         for(var path: paths) {
             if (path.contains("_report")) {
-                reportFilePath.saveSingleFileToStorage(path);
+                reportBlobHandler.saveSingleFileToStorage(path);
+                logger.info("Saved report");
             }
             else if (!paths.contains("_report")) {
                 filteredPaths.add(path);
