@@ -30,6 +30,11 @@ import java.util.stream.Collectors;
 
 /**
  * The OpenAIAnalyzer class provides functionality to analyze text using the OpenAI API.
+ * It includes methods to analyze transcribed text, extract information from transcribed files,
+ * build a JSON file from the result of an analyzed call, and get the analysis result of a transcribed call.
+ *
+ * The class is initialized with an API key, endpoint, and deployment or model ID for the OpenAI service.
+ * It uses a custom HttpClient with a modified response timeout and a RetryPolicy for handling retries.
  */
 public class OpenAIAnalyzer {
     private final OpenAIClient client;
@@ -38,6 +43,9 @@ public class OpenAIAnalyzer {
 
     /**
      * Constructs a new OpenAIAnalyzer with the specified API key, endpoint, and deployment or model ID.
+     * It initializes the OpenAIClient with a custom HttpClient and RetryPolicy.
+     * The HttpClient has a modified response timeout of 2 minutes.
+     * The RetryPolicy has a delay of 10 seconds and a maximum of 3 retry attempts.
      *
      * @param openAiKey           The API key for accessing the OpenAI service.
      * @param openAiEndpoint      The endpoint URL of the OpenAI service.
@@ -68,13 +76,16 @@ public class OpenAIAnalyzer {
     }
 
     /**
-     * Analyzes transcribed text and language to generate chat completions and usage statistics.
+     * Analyzes the transcribed text using the OpenAI API.
      *
-     * @param transcribedCallInformation the transcribed text along with its language
-     * @return an AnalyzeResult object containing chat completions and usage statistics
-     * The main prompt can be found under src/main/resources/prompt.txt
-     * If you wish to change the output format or add/remove anything you can edit that file.
-     * We would recommend to follow the prompt style used.
+     * This method reads a prompt from a file, sends a series of chat messages to the OpenAI API, and collects the responses.
+     * The chat messages include a system message to clear the cache, a system message containing the main prompt, and a user message containing the transcribed text.
+     * The responses from the OpenAI API are concatenated into a single string.
+     * The total number of tokens used in the analysis is also recorded.
+     *
+     * @param transcribedCallInformation The transcribed call information, which includes the transcribed text.
+     * @return An AnalyzeResult object containing the analysis result and the number of tokens used.
+     * @throws RuntimeException if an IOException occurs when reading the prompt file or if an error occurs during the analysis.
      */
     public AnalyzeResult analyze(TranscribedCallInformation transcribedCallInformation) {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
@@ -102,10 +113,14 @@ public class OpenAIAnalyzer {
     }
 
     /**
-     * Get the analysis from the transcribed call
+     * This method attempts to analyze a transcribed call up to three times.
+     * It uses the analyze() method to perform the analysis and checks if the result is a valid JSON.
+     * If the result is not a valid JSON, it retries the analysis up to three times.
+     * If after three attempts the result is still not a valid JSON, it throws a RuntimeException.
      *
-     * @param transcribedCall The file to analys
-     * @return the analysis of the transcribed call
+     * @param transcribedCall The transcribed call information, which includes the transcribed text, its duration, and the path to the file.
+     * @return An AnalyzeResult object containing the analysis result and the number of tokens used.
+     * @throws RuntimeException if after three attempts the result of the analysis is still not a valid JSON.
      */
     @NotNull
     public AnalyzeResult getAnalyzeResult(TranscribedCallInformation transcribedCall) {
@@ -143,8 +158,9 @@ public class OpenAIAnalyzer {
     /**
      * Extracting the information needed from the transcribed file (json start at 10k lines)
      *
-     * @param paths File name to extract data from
-     * @return a list of all extracted files in json format
+     * @param paths A list of file paths to the transcribed files.
+     * @return A list of TranscribedCallInformation objects, each containing the transcription, duration, and path of a transcribed call.
+     * @throws RuntimeException if an IOException occurs when reading the file or parsing the JSON content.
      */
     public static List<TranscribedCallInformation> extractInformationFromTranscribedFiles(List<String> paths) {
         List<TranscribedCallInformation> transcribedCalls = new ArrayList<>();
