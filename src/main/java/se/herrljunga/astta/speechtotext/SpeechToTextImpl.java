@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Implementation of the SpeechToText interface for converting speech to text using Azure Cognitive Services.
  */
+@Deprecated
 public class SpeechToTextImpl implements SpeechToText {
     SpeechConfig speechConfig;
     private Logger logger = LoggerFactory.getLogger(SpeechToTextImpl.class);

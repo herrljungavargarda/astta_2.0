@@ -2,6 +2,13 @@ package se.herrljunga.astta.utils;
 
 import java.util.List;
 
+/**
+ * The Config class.
+ *
+ * This class provides configuration settings for the application.
+ * It includes settings for Azure Speech to Text service, Azure Blob Storage, Azure OpenAI, and other utilities.
+ * The settings are stored as public static fields, so they can be accessed directly from other classes.
+ */
 public class Config {
     //Speech To Text
     public static String speechToTextRegion = "swedencentral"; // Location of your region host (can be found when signed in to Azure Portal under Speech service)
