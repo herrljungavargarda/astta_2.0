@@ -17,12 +17,18 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The Utils class.
+ *
+ * This class provides utility methods for the application.
+ * It includes methods for creating and deleting temporary directories, manipulating file paths, calculating audio file duration, creating and validating JSON objects, and writing to files.
+ */
 public class Utils {
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
 
     /**
      * Creates a temporary directory to store temporary files.
-     * If the directory already exists, its contents and the directory are deleted before creating a new e directory.
+     * If the directory already exists, its contents and the directory are deleted before creating a new directory.
      */
     public static void createTempDirectory() {
         File path = new File(Config.pathToTemp);
@@ -99,6 +105,8 @@ public class Utils {
     }
 
     /**
+     * Calculates the duration of an audio file in seconds.
+     *
      * @param audioFilePath the path to the audio file
      * @return the duration of the audio file in seconds
      * @throws UnsupportedAudioFileException if audio file is not supported
@@ -148,7 +156,12 @@ public class Utils {
             throw new RuntimeException("Exception thrown in Utils, createJson " + e.getMessage());
         }
     }
-
+    /**
+     * Validates a JSON string.
+     *
+     * @param jsonToValidate The JSON string to validate.
+     * @return True if the JSON string is valid, false otherwise.
+     */
     public static boolean validateJson(String jsonToValidate) {
 
         try {
@@ -161,14 +174,20 @@ public class Utils {
     }
 
     /**
+     * Writes a list of AnalyzedCall objects to files.
+     *
      * @param analyzedCalls the calls to write to the file
-     **/
+     */
     public static void writeToFile(List<AnalyzedCall> analyzedCalls) {
         for (var analyzedCall : analyzedCalls) {
             writeToFile(analyzedCall);
         }
     }
-
+    /**
+     * Writes an AnalyzedCall object to a file.
+     *
+     * @param analyzedCall The AnalyzedCall object to write to a file.
+     */
     public static void writeToFile(AnalyzedCall analyzedCall) {
         logger.info("Writing to file: {}", analyzedCall.savePath());
         try {
@@ -183,6 +202,13 @@ public class Utils {
         }
     }
 
+    /**
+     * Extracts a specific element from a JSON string.
+     *
+     * @param response The JSON string.
+     * @param elementToGet The element to extract from the JSON string.
+     * @return The value of the specified element as a string.
+     */
     public static String getElementFromJson(String response, String elementToGet) {
         try{
         JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
@@ -194,6 +220,14 @@ public class Utils {
         }
     }
 
+    /**
+     * Extracts report files from a list of paths and saves them to a specified StorageHandler.
+     * Non-report paths are returned in a new list.
+     *
+     * @param paths The list of paths.
+     * @param reportBlobHandler The StorageHandler to save the report files to.
+     * @return A list of paths that do not contain reports.
+     */
     public static List<String> extractReport(List<String> paths, StorageHandler reportBlobHandler) {
         List<String> filteredPaths = new ArrayList<>();
         for(var path: paths) {
