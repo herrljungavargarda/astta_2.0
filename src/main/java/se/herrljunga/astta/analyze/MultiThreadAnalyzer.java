@@ -15,23 +15,37 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ * The MultiThreadAnalyzer class.
+ *
+ * This class provides methods for multi-threaded analysis of transcribed calls.
+ * It uses an instance of OpenAIAnalyzer to perform the analysis.
+ * The analysis is performed in a separate thread for each transcribed call.
+ */
 public class MultiThreadAnalyzer {
     private final OpenAIAnalyzer analyzer;
     private final Logger logger = LoggerFactory.getLogger(OpenAIAnalyzer.class);
 
+    /**
+     * Constructs a new MultiThreadAnalyzer instance with the specified OpenAIAnalyzer.
+     *
+     * @param analyzer The OpenAIAnalyzer to be used for analysis.
+     */
     public MultiThreadAnalyzer(OpenAIAnalyzer analyzer) {
         this.analyzer = analyzer;
     }
 
     /**
      * Starts multi-threaded analysis of transcribed calls.
-     * <p>
+     *
      * This method uses an ExecutorService to manage threads. Each transcribed call is analyzed in a separate thread.
      * The method waits for all threads to complete before it returns.
      *
      * @param transcribedCalls a list of transcribed calls to be analyzed
+     * @param powerBiBlobStorage the StorageHandler for Power BI Blob Storage
+     * @param audioSource the StorageHandler for the audio source
+     * @return a list of analyzed calls
      */
-
     public List<AnalyzedCall> startAnalysis(List<TranscribedCallInformation> transcribedCalls, StorageHandler powerBiBlobStorage, StorageHandler audioSource) {
         ExecutorService executorService = Executors.newFixedThreadPool(Config.maxThreadsForAnalysis);
         List<Future<?>> futures = new ArrayList<>();

@@ -9,6 +9,7 @@ import com.azure.core.credential.AzureKeyCredential;
  * Implementation class for erforming text analysis operations.
  */
 
+@Deprecated
 public class AnalyzeImpl implements Analyze {
     TextAnalyticsClient client;
 
