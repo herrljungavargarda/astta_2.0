@@ -15,7 +15,6 @@ import com.google.gson.JsonParser;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.herrljunga.astta.App;
 import se.herrljunga.astta.utils.AnalyzedCall;
 import se.herrljunga.astta.utils.Config;
 import se.herrljunga.astta.utils.TranscribedCallInformation;
@@ -65,7 +64,7 @@ public class OpenAIAnalyzer {
 
         this.client = new OpenAIClientBuilder().credential(new AzureKeyCredential(openAiKey)).endpoint(openAiEndpoint).httpClient(httpClient).retryPolicy(retryPolicy).buildClient();
         this.deploymentOrModelId = deploymentOrModelId;
-        logger.info("OpenAIAnalyzer initialized with deployment/model ID: " + deploymentOrModelId);
+        logger.info("OpenAIAnalyzer initialized with deployment/model ID: {}", deploymentOrModelId);
     }
 
     /**
@@ -94,10 +93,10 @@ public class OpenAIAnalyzer {
             }
             CompletionsUsage usage = chatCompletions.getUsage();
 
-            logger.info("Analysis of " + Utils.removePathFromFilename(transcribedCallInformation.getPath()) + " completed successfully. Total tokens used: " + usage.getTotalTokens());
+            logger.info("Analysis of {} completed successfully. Total tokens used: {}", Utils.removePathFromFilename(transcribedCallInformation.getPath()), usage.getTotalTokens());
             return new AnalyzeResult(sb.toString(), usage.getTotalTokens());
         } catch (IOException e) {
-            logger.error("An error occurred when reading prompt.txt: " + e.getMessage());
+            logger.error("An error occurred when reading prompt.txt: {}", e.getMessage());
             throw new RuntimeException("Exception thrown in OpenAiAnalyzer, analyze " + e.getMessage());
         }
     }
@@ -112,7 +111,7 @@ public class OpenAIAnalyzer {
     public AnalyzeResult getAnalyzeResult(TranscribedCallInformation transcribedCall) {
         AnalyzeResult analyzedCallResult;
         for (int i = 1; true; i++) {
-            LoggerFactory.getLogger(App.class).info("Analyzing " + Utils.removePathFromFilename(transcribedCall.getPath()) + " attempt: " + i);
+            logger.info("Analyzing {} attempt: {}", Utils.removePathFromFilename(transcribedCall.getPath()), i);
             analyzedCallResult = analyze(transcribedCall);
 
             if (Utils.validateJson(analyzedCallResult.result())) {
@@ -168,7 +167,8 @@ public class OpenAIAnalyzer {
                 TranscribedCallInformation transcribedCall = new TranscribedCallInformation(transcription, duration, path);
                 transcribedCalls.add(transcribedCall);
             }
-        } catch (IOException e) { //TODO: fixa
+        } catch (IOException e) {
+            LoggerFactory.getLogger(OpenAIAnalyzer.class).error("An error occurred when extracting information from {}, {}", paths, e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
         return transcribedCalls;
