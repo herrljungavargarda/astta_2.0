@@ -5,6 +5,7 @@ for use to transcribe and analyze calls coming to service desk.
 
 ## Before use there are some requirements:
 
+- Java 17
 - Azure Speech To Text
 - Azure OpenAi
 - Blob storage (or any place to store audio/text files)

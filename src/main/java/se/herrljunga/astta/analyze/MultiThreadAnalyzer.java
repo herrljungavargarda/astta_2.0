@@ -56,10 +56,10 @@ public class MultiThreadAnalyzer {
             Future<?> future = executorService.submit(() -> {
                 try {
                     AnalyzeResult analyzedCallResult = analyzer.getAnalyzeResult(call);
-
-                    analyzedCalls.add(analyzer.buildJsonFile(analyzedCallResult, call));
-                    powerBiBlobStorage.saveSingleFileToStorage(analyzer.buildJsonFile(analyzedCallResult, call).savePath());
-                    //audioSource.deleteFromStorage(Utils.getFileName(analyzer.buildJsonFile(analyzedCallResult, call).savePath()));
+                    AnalyzedCall analyzedCall = analyzer.buildJsonFile(analyzedCallResult, call);
+                    analyzedCalls.add(analyzedCall);
+                    powerBiBlobStorage.saveSingleFileToStorage((analyzedCall).savePath());
+                    audioSource.deleteFromStorage((analyzedCall).savePath());
                 } catch (Exception e) {
                     logger.error("An error occurred when analysing the file: {}\n{}", Utils.removePathFromFilename(call.getPath()), e.getMessage());
                     throw new RuntimeException(e);

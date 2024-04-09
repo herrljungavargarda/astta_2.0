@@ -33,13 +33,15 @@ public class Utils {
     public static void createTempDirectory() {
         File path = new File(Config.pathToTemp);
         Path directoryPath = Paths.get(path.getPath());
-
         // Delete the folder if it exists, we don't want old temp files
         deleteFolderIfExists(path);
 
         try {
             logger.info("Creating temp directory");
             Files.createDirectory(directoryPath);
+            File analyzedJsonSaveDirectory = new File(Config.analyzedJsonSaveDirectory);
+            Path analyzedJsonSaveDirectorydirectoryPath = Paths.get(analyzedJsonSaveDirectory.getPath());
+            Files.createDirectory(analyzedJsonSaveDirectorydirectoryPath); // Create temp analyzed directory to store analyzed files
             logger.info("Done creating temp directory");
         } catch (IOException ex) {
             logger.info("An error occurred when trying to create directory.");
@@ -141,14 +143,14 @@ public class Utils {
 
 
     public static String createJson(String content, String duration, int tokensUsed, String path) {
-        logger.info("Creating and parsing json");
+        logger.info("Creating and parsing json: {}", path);
         try {
             JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
             jsonObject.addProperty("FileLength", duration);
             jsonObject.addProperty("TokensUsed", tokensUsed);
             jsonObject.addProperty("AgentName", GetAgentName.getAgentName(path));
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            logger.info("Done creating and parsing json");
+            logger.info("Done creating and parsing json: {}", path);
             return gson.toJson(jsonObject);
         } catch (JsonParseException e) {
             logger.error("An error occurred when trying to parse Json.{}", e.getMessage());

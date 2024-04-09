@@ -149,7 +149,7 @@ public class OpenAIAnalyzer {
         String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getCallDuration(), analyzedCallResult.tokensUsed(), transcribedCall.getPath());
         String analyzedCallJsonPath = Config.analyzedJsonSaveDirectory +    // The json save location folder
                 Utils.getFileName(transcribedCall.getPath()) // Adds the filename of the audiofile (removes path)
-                + ".analyzed.json"; // Make it a json file
+                + ".json"; // Make it a json file
         AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);
         Utils.writeToFile(analyzedCall);
         return analyzedCall;

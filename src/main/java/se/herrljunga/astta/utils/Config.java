@@ -32,7 +32,7 @@ public class Config {
 
     //Utils
     public static String pathToTemp = "src/main/temp/";
-    public static String analyzedJsonSaveDirectory = "src/main/temp/";
+    public static String analyzedJsonSaveDirectory = "src/main/temp/analyzed/";
     public static String transcribedTextSaveDirectory = "src/main/temp/";
     public static String sasTokenTranscriptionBlobSecretName = "sasTokenTranscriptionBlob";
 
