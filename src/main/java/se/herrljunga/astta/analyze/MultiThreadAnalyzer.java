@@ -59,7 +59,7 @@ public class MultiThreadAnalyzer {
                     AnalyzedCall analyzedCall = analyzer.buildJsonFile(analyzedCallResult, call);
                     analyzedCalls.add(analyzedCall);
                     powerBiBlobStorage.saveSingleFileToStorage((analyzedCall).savePath());
-                    audioSource.deleteFromStorage((analyzedCall).savePath());
+                    audioSource.deleteFromStorage(Utils.getFileName((analyzedCall).savePath()));
                 } catch (Exception e) {
                     logger.error("An error occurred when analysing the file: {}\n{}", Utils.removePathFromFilename(call.getPath()), e.getMessage());
                     throw new RuntimeException(e);

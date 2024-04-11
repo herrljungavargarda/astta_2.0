@@ -95,7 +95,7 @@ public class OpenAIAnalyzer {
             chatMessages.add(new ChatRequestSystemMessage("Before continuing, REMOVE OLD CACHE."));
             chatMessages.add(new ChatRequestSystemMessage(mainPrompt));
             chatMessages.add(new ChatRequestUserMessage(transcribedCallInformation.getTranscribedText()));
-            ChatCompletions chatCompletions = client.getChatCompletions(deploymentOrModelId, new ChatCompletionsOptions(chatMessages));
+            ChatCompletions chatCompletions = client.getChatCompletions(deploymentOrModelId, new ChatCompletionsOptions(chatMessages).setTemperature(0.4));
 
             StringBuilder sb = new StringBuilder();
             for (ChatChoice choice : chatCompletions.getChoices()) {
