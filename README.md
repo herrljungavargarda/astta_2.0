@@ -6,9 +6,6 @@ Built upon Java 17, the project seamlessly integrates Azure Speech to Text funct
 Leveraging the analytical capabilities of OpenAI, the transcribed text is subjected to in-depth analysis,
 providing invaluable insights into the nature and content of the calls.
 Subsequently,the analyzed data is formatted into JSON files, enabling efficient storage and retrieval.
-Furthermore, to enhance data visualization and interpretation,
-the JSON files are seamlessly integrated with Power BI for intuitive visual analysis,
-empowering stakeholders with actionable insights derived from call data.
 
 ## Before use there are some requirements:
 
