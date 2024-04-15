@@ -18,7 +18,7 @@ public class FetchSaveTest {
         StorageHandler fetchSave = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
                 KeyVault.getSecret(Config.sasTokenSecretName),
                 Config.textSaveContainerName);
-        List<byte[]> result = fetchSave.fetchByte();
+        List<byte[]> result = null;
         assertThat(result).isNotEmpty();
     }
 }

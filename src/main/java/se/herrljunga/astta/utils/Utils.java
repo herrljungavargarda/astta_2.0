@@ -17,23 +17,31 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The Utils class.
+ *
+ * This class provides utility methods for the application.
+ * It includes methods for creating and deleting temporary directories, manipulating file paths, calculating audio file duration, creating and validating JSON objects, and writing to files.
+ */
 public class Utils {
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
 
     /**
      * Creates a temporary directory to store temporary files.
-     * If the directory already exists, its contents and the directory are deleted before creating a new e directory.
+     * If the directory already exists, its contents and the directory are deleted before creating a new directory.
      */
     public static void createTempDirectory() {
         File path = new File(Config.pathToTemp);
         Path directoryPath = Paths.get(path.getPath());
-
         // Delete the folder if it exists, we don't want old temp files
         deleteFolderIfExists(path);
 
         try {
             logger.info("Creating temp directory");
             Files.createDirectory(directoryPath);
+            File analyzedJsonSaveDirectory = new File(Config.analyzedJsonSaveDirectory);
+            Path analyzedJsonSaveDirectorydirectoryPath = Paths.get(analyzedJsonSaveDirectory.getPath());
+            Files.createDirectory(analyzedJsonSaveDirectorydirectoryPath); // Create temp analyzed directory to store analyzed files
             logger.info("Done creating temp directory");
         } catch (IOException ex) {
             logger.info("An error occurred when trying to create directory.");
@@ -66,7 +74,7 @@ public class Utils {
                 });
                 logger.info("Temp directory deleted.");
             } catch (IOException e) {
-                logger.error("An error occurred when trying to delete directory." + e);
+                logger.error("An error occurred when trying to delete directory.{}", e);
                 throw new RuntimeException("Exception thrown in Utils, deleteFolderIfExists " + e.getMessage());
             }
         }
@@ -99,6 +107,8 @@ public class Utils {
     }
 
     /**
+     * Calculates the duration of an audio file in seconds.
+     *
      * @param audioFilePath the path to the audio file
      * @return the duration of the audio file in seconds
      * @throws UnsupportedAudioFileException if audio file is not supported
@@ -113,10 +123,10 @@ public class Utils {
             long audioFileLength = audioFile.length();
             int frameSize = format.getFormat().getFrameSize();
             float frameRate = format.getFormat().getFrameRate();
-            logger.info("Done calculating audio file duration: " + audioFileLength / (frameSize * frameRate));
+            logger.info("Done calculating audio file duration: {}", audioFileLength / (frameSize * frameRate));
             return audioFileLength / (frameSize * frameRate);
         } catch (UnsupportedAudioFileException | IOException e) {
-            logger.error("An error occurred when trying to get audio file duration." + e);
+            logger.error("An error occurred when trying to get audio file duration.{}", e.getMessage());
             throw new RuntimeException("Exception thrown in Utils, getAudioDuration " + e.getMessage());
         }
     }
@@ -133,66 +143,99 @@ public class Utils {
 
 
     public static String createJson(String content, String duration, int tokensUsed, String path) {
-        logger.info("Creating and parsing json");
+        logger.info("Creating and parsing json: {}", path);
         try {
             JsonObject jsonObject = new Gson().fromJson(content, JsonObject.class);
             jsonObject.addProperty("FileLength", duration);
             jsonObject.addProperty("TokensUsed", tokensUsed);
             jsonObject.addProperty("AgentName", GetAgentName.getAgentName(path));
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            logger.info("Done creating and parsing json");
+            logger.info("Done creating and parsing json: {}", path);
             return gson.toJson(jsonObject);
         } catch (JsonParseException e) {
-            logger.error("An error occurred when trying to parse Json." + e);
-            logger.error("Json: " + content);
+            logger.error("An error occurred when trying to parse Json.{}", e.getMessage());
+            logger.error("Json: {}", content);
             throw new RuntimeException("Exception thrown in Utils, createJson " + e.getMessage());
         }
     }
-
+    /**
+     * Validates a JSON string.
+     *
+     * @param jsonToValidate The JSON string to validate.
+     * @return True if the JSON string is valid, false otherwise.
+     */
     public static boolean validateJson(String jsonToValidate) {
 
         try {
             new Gson().fromJson(jsonToValidate, JsonObject.class);
             return true;
         } catch (Exception e) {
-            logger.warn("Bad json string:\n" + jsonToValidate);
+            logger.warn("Bad json string:\n{}", jsonToValidate);
             return false;
         }
     }
 
     /**
+     * Writes a list of AnalyzedCall objects to files.
+     *
      * @param analyzedCalls the calls to write to the file
-     **/
+     */
     public static void writeToFile(List<AnalyzedCall> analyzedCalls) {
         for (var analyzedCall : analyzedCalls) {
             writeToFile(analyzedCall);
         }
     }
-
+    /**
+     * Writes an AnalyzedCall object to a file.
+     *
+     * @param analyzedCall The AnalyzedCall object to write to a file.
+     */
     public static void writeToFile(AnalyzedCall analyzedCall) {
-        logger.info("Writing to file: " + analyzedCall.savePath());
+        logger.info("Writing to file: {}", analyzedCall.savePath());
         try {
             FileWriter fileWriter = new FileWriter(analyzedCall.savePath());
             fileWriter.write(analyzedCall.analyzedCallJson());
             fileWriter.flush();
             fileWriter.close();
-            logger.info("Done writing to file: " + analyzedCall.savePath());
+            logger.info("Done writing to file: {}", analyzedCall.savePath());
         } catch (IOException e) {
-            logger.error("An error occurred when trying to write to file." + e);
+            logger.error("An error occurred when trying to write to file.{}", e);
             throw new RuntimeException("Exception thrown in Utils, writeToFile " + e.getMessage());
         }
     }
 
+    /**
+     * Extracts a specific element from a JSON string.
+     *
+     * @param response The JSON string.
+     * @param elementToGet The element to extract from the JSON string.
+     * @return The value of the specified element as a string.
+     */
     public static String getElementFromJson(String response, String elementToGet) {
+        try{
         JsonObject jsonObject = new Gson().fromJson(response, JsonObject.class);
         return jsonObject.get(elementToGet).getAsString();
+        }
+        catch (JsonSyntaxException e){
+            logger.error("An error occurred when extracting {} from Json file \n{} \n{}", elementToGet, response, e.getMessage());
+            throw new RuntimeException("Exception thrown in Utils, writeToFile " + e.getMessage());
+        }
     }
 
-    public static List<String> extractReport(List<String> paths, StorageHandler reportFilePath) {
+    /**
+     * Extracts report files from a list of paths and saves them to a specified StorageHandler.
+     * Non-report paths are returned in a new list.
+     *
+     * @param paths The list of paths.
+     * @param reportBlobHandler The StorageHandler to save the report files to.
+     * @return A list of paths that do not contain reports.
+     */
+    public static List<String> extractReport(List<String> paths, StorageHandler reportBlobHandler) {
         List<String> filteredPaths = new ArrayList<>();
         for(var path: paths) {
             if (path.contains("_report")) {
-                reportFilePath.saveSingleFileToStorage(path);
+                reportBlobHandler.saveSingleFileToStorage(path);
+                logger.info("Saved report");
             }
             else if (!paths.contains("_report")) {
                 filteredPaths.add(path);

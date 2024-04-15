@@ -12,6 +12,7 @@ empowering stakeholders with actionable insights derived from call data.
 
 ## Before use there are some requirements:
 
+- Java 17
 - Azure Speech To Text
 - Azure OpenAi
 - Blob storage (or any place to store audio/text files)
@@ -61,10 +62,12 @@ az keyvault set-policy --name Your-Key-Vault-Name --upn user@domain.com --secret
 
 ## How the application works:
 
-#### 1. Fetching an audio file from dedicated storage
+#### 1. Using Batch Transcription to transcribe multiple files simultaneously
 
-#### 2. Transcribes that file using Azure Speech To Text
+#### 2. Creates a thread for each transcription
 
 #### 3. Analyzing the transcribed text using Azure OpenAi
 
 #### 4. Saving output to dedicated storage as json format
+
+#### 5. Removes the original audio file from storage
