@@ -59,3 +59,11 @@ az keyvault set-policy --name Your-Key-Vault-Name --upn user@domain.com --secret
 #### 4. Saving output to dedicated storage as json format
 
 #### 5. Removes the original audio file from storage
+
+## Errors
+
+### Handling Error Code 429:
+#### If you encounter error code 429 while running the program, it indicates that you've likely exhausted your token allowance. To mitigate this issue, consider reducing the value of the "maxThreadsForAnalysis" parameter in the configuration file. Decreasing this value can help manage token usage and prevent further occurrences of error code 429.
+
+### Configuring Content Filtering:
+#### If you encounter issues related to content filtering, you can establish a content filter through your Azure portal. Setting up a content filter allows you to manage and regulate the type of content processed by the program, ensuring compliance with your requirements and standards.

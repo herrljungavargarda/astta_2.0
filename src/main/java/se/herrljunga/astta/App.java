@@ -46,7 +46,7 @@ public class App {
 
             List<TranscribedCallInformation> transcribedCallInformations = OpenAIAnalyzer.extractInformationFromTranscribedFiles(filteredTranscribedPaths);
 
-            // Run the whole chain
+            // Run the whole analyze chain
             multiThreadAnalyzer.startAnalysis(transcribedCallInformations, powerBiBlobStorage, audioSource);
         } catch (Exception e) {
             e.printStackTrace();
