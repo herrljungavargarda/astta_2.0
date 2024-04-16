@@ -10,6 +10,7 @@ Subsequently,the analyzed data is formatted into JSON files, enabling efficient 
 ## Before use there are some requirements:
 
 - Java 17
+- JRE (Java Runtime Environment)
 - Azure Speech To Text
 - Azure OpenAi
 - Blob storage (or any place to store audio/text files)
