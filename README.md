@@ -1,7 +1,11 @@
 # Azure-Speech-To-Text-Analysis
 
-This project is made by three students developers from YRGO on behalf of Herrljunga and Vårgårda municipality,
-for use to transcribe and analyze calls coming to service desk.
+This initiative, undertaken by three student developers from YRGO in collaboration with Herrljunga and Vårgårda municipality,
+aims to streamline the transcription and analysis process of calls received by the service desk.
+Built upon Java 17, the project seamlessly integrates Azure Speech to Text functionality to accurately transcribe incoming calls.
+Leveraging the analytical capabilities of OpenAI, the transcribed text is subjected to in-depth analysis,
+providing invaluable insights into the nature and content of the calls.
+Subsequently,the analyzed data is formatted into JSON files, enabling efficient storage and retrieval.
 
 ## Before use there are some requirements:
 
@@ -10,6 +14,11 @@ for use to transcribe and analyze calls coming to service desk.
 - Azure OpenAi
 - Blob storage (or any place to store audio/text files)
 - Key vault to store secrets and keys (can be stored in any way you wish)
+
+## Developer Knowledge:
+
+- Java
+- API usage
 
 ------------
 
