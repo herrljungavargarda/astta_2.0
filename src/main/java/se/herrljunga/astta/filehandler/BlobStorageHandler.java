@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.herrljunga.astta.utils.AnalyzedCall;
 import se.herrljunga.astta.utils.Config;
+import se.herrljunga.astta.utils.ConfigLoader;
 import se.herrljunga.astta.utils.Utils;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.concurrent.Future;
  * It can also be initialized with a StorageSharedKeyCredential for authentication.
  */
 public class BlobStorageHandler implements StorageHandler {
+    private static Config config = ConfigLoader.loadConfig();
     BlobServiceClient blobServiceClient;
     BlobContainerClient blobContainerClient;
     List<String> blobFilePath = new ArrayList<>();
@@ -107,8 +109,8 @@ public class BlobStorageHandler implements StorageHandler {
                     // blobName - Adding the same name as the file in Blob Storage
                     BlobClient blobClient = blobContainerClient.getBlobClient(blobName);
                     blobFilePath.add(blobName);
-                    blobClient.downloadToFile(Config.pathToTemp + Utils.removePathFromFilename(blobName));
-                    paths.add(Config.pathToTemp + Utils.removePathFromFilename(blobName));
+                    blobClient.downloadToFile(config.utils.pathToTemp + Utils.removePathFromFilename(blobName));
+                    paths.add(config.utils.pathToTemp + Utils.removePathFromFilename(blobName));
                     logger.info("Done fetching file: {}", Utils.removePathFromFilename(blobName));
                 } catch (BlobStorageException | StorageErrorException e) {
                     System.err.println("An error fetching files from blob");

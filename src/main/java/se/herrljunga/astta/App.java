@@ -8,29 +8,26 @@ import se.herrljunga.astta.filehandler.BlobStorageHandler;
 import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.keyvault.KeyVault;
 import se.herrljunga.astta.speechtotext.BatchTranscriber;
-import se.herrljunga.astta.utils.AnalyzedCall;
-import se.herrljunga.astta.utils.Config;
-import se.herrljunga.astta.utils.TranscribedCallInformation;
-import se.herrljunga.astta.utils.Utils;
+import se.herrljunga.astta.utils.*;
 
-import java.io.IOException;
 import java.util.List;
 
 
 public class App {
-    static StorageHandler reportBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
-            KeyVault.getSecret(Config.sasTokenSecretName),
-            Config.textSaveContainerName);
-    static StorageHandler powerBiBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
-            KeyVault.getSecret(Config.sasTokenSecretName),
-            Config.powerBiContainerName);
-    static StorageHandler tempBlobStorage = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
-            KeyVault.getSecret(Config.sasTokenSecretName),
-            Config.tempContainerName);
-    static StorageHandler audioSource = new BlobStorageHandler(KeyVault.getSecret(Config.blobStorageEndpoint),
-            KeyVault.getSecret(Config.sasTokenSecretName),
-            Config.audioSourceContainerName);
-    static MultiThreadAnalyzer multiThreadAnalyzer = new MultiThreadAnalyzer(new OpenAIAnalyzer(KeyVault.getSecret(Config.openaiSecretName), KeyVault.getSecret(Config.openaiEndpoint), Config.openaiModel));
+    private static final Config config = ConfigLoader.loadConfig();
+    static StorageHandler reportBlobStorage = new BlobStorageHandler(KeyVault.getSecret(config.blobStorage.endpoint),
+            KeyVault.getSecret(config.blobStorage.sasTokenSecretName),
+            config.blobStorage.reportSaveContainerName);
+    static StorageHandler powerBiBlobStorage = new BlobStorageHandler(KeyVault.getSecret(config.blobStorage.endpoint),
+            KeyVault.getSecret(config.blobStorage.sasTokenSecretName),
+            config.blobStorage.powerBiContainerName);
+    static StorageHandler tempBlobStorage = new BlobStorageHandler(KeyVault.getSecret(config.blobStorage.endpoint),
+            KeyVault.getSecret(config.blobStorage.sasTokenSecretName),
+            config.blobStorage.tempContainerName);
+    static StorageHandler audioSource = new BlobStorageHandler(KeyVault.getSecret(config.blobStorage.endpoint),
+            KeyVault.getSecret(config.blobStorage.sasTokenSecretName),
+            config.blobStorage.audioSourceContainerName);
+    static MultiThreadAnalyzer multiThreadAnalyzer = new MultiThreadAnalyzer(new OpenAIAnalyzer(KeyVault.getSecret(config.openAI.secretName), KeyVault.getSecret(config.openAI.endpoint), config.openAI.model));
     static BatchTranscriber batchTranscriber = new BatchTranscriber();
 
     public static void main(String[] args) {

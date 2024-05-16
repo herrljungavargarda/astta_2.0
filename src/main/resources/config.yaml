@@ -1,0 +1,32 @@
+speechToText:
+  region: "swedencentral"
+  supportedLanguages:
+    - "sv-SE"
+    - "en-US"
+  secretName: "speechtotextkey"
+
+blobStorage:
+  accountSecretName: "accountname"
+  accountSecretKey: "accountkey"
+  audioSourceContainerName: "wavfiles"
+  reportSaveContainerName: "report"
+  powerBiContainerName: "pwrbi"
+  tempContainerName: "temp"
+  sasTokenSecretName: "sastoken"
+  endpoint: "blobstorageendpoint"
+
+openAI:
+  secretName: "openaikey"
+  endpoint: "openaiendpoint"
+  model: "gpt-4"
+  promptPath: "/prompt.txt"
+
+utils:
+  pathToTemp: "temp/"
+  analyzedJsonSaveDirectory: "temp/analyzed/"
+  transcribedTextSaveDirectory: "temp/"
+  sasTokenTranscriptionBlobSecretName: "sasTokenTranscriptionBlob"
+  transcriptionApiUrl: "https://swedencentral.api.cognitive.microsoft.com/speechtotext/v3.1/transcriptions/"
+  transcriptionsApiUrlPreview: "https://swedencentral.api.cognitive.microsoft.com/speechtotext/v3.2-preview.2/transcriptions/"
+
+maxThreadsForAnalysis: 20

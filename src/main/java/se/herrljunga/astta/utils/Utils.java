@@ -25,13 +25,13 @@ import java.util.List;
  */
 public class Utils {
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
-
+    private static Config config = ConfigLoader.loadConfig();
     /**
      * Creates a temporary directory to store temporary files.
      * If the directory already exists, its contents and the directory are deleted before creating a new directory.
      */
     public static void createTempDirectory() {
-        File path = new File(Config.pathToTemp);
+        File path = new File(config.utils.pathToTemp);
         Path directoryPath = Paths.get(path.getPath());
         // Delete the folder if it exists, we don't want old temp files
         deleteFolderIfExists(path);
@@ -39,7 +39,7 @@ public class Utils {
         try {
             logger.info("Creating temp directory");
             Files.createDirectory(directoryPath);
-            File analyzedJsonSaveDirectory = new File(Config.analyzedJsonSaveDirectory);
+            File analyzedJsonSaveDirectory = new File(config.utils.analyzedJsonSaveDirectory);
             Path analyzedJsonSaveDirectorydirectoryPath = Paths.get(analyzedJsonSaveDirectory.getPath());
             Files.createDirectory(analyzedJsonSaveDirectorydirectoryPath); // Create temp analyzed directory to store analyzed files
             logger.info("Done creating temp directory");

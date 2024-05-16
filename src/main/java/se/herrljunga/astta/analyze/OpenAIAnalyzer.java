@@ -15,12 +15,12 @@ import com.google.gson.JsonParser;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.herrljunga.astta.utils.AnalyzedCall;
-import se.herrljunga.astta.utils.Config;
-import se.herrljunga.astta.utils.TranscribedCallInformation;
-import se.herrljunga.astta.utils.Utils;
+import se.herrljunga.astta.utils.*;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -32,11 +32,12 @@ import java.util.stream.Collectors;
  * The OpenAIAnalyzer class provides functionality to analyze text using the OpenAI API.
  * It includes methods to analyze transcribed text, extract information from transcribed files,
  * build a JSON file from the result of an analyzed call, and get the analysis result of a transcribed call.
- *
+ * <p>
  * The class is initialized with an API key, endpoint, and deployment or model ID for the OpenAI service.
  * It uses a custom HttpClient with a modified response timeout and a RetryPolicy for handling retries.
  */
 public class OpenAIAnalyzer {
+    private static Config config = ConfigLoader.loadConfig();
     private final OpenAIClient client;
     private final String deploymentOrModelId;
     private final Logger logger = LoggerFactory.getLogger(OpenAIAnalyzer.class);
@@ -77,7 +78,7 @@ public class OpenAIAnalyzer {
 
     /**
      * Analyzes the transcribed text using the OpenAI API.
-     *
+     * <p>
      * This method reads a prompt from a file, sends a series of chat messages to the OpenAI API, and collects the responses.
      * The chat messages include a system message to clear the cache, a system message containing the main prompt, and a user message containing the transcribed text.
      * The responses from the OpenAI API are concatenated into a single string.
@@ -89,27 +90,24 @@ public class OpenAIAnalyzer {
      */
     public AnalyzeResult analyze(TranscribedCallInformation transcribedCallInformation) {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
-        String filePath = "src/main/resources/promptWithoutAgent.txt";
-        try {
-            String mainPrompt = Files.readAllLines(Paths.get(filePath)).stream().collect(Collectors.joining(System.lineSeparator()));
-            chatMessages.add(new ChatRequestSystemMessage("Before continuing, REMOVE OLD CACHE."));
-            chatMessages.add(new ChatRequestSystemMessage(mainPrompt));
-            chatMessages.add(new ChatRequestUserMessage(transcribedCallInformation.getTranscribedText()));
-            ChatCompletions chatCompletions = client.getChatCompletions(deploymentOrModelId, new ChatCompletionsOptions(chatMessages).setTemperature(0.4));
+        String promptPath = config.openAI.promptPath;
+        InputStream in = getClass().getResourceAsStream(promptPath);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        String mainPrompt = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+        chatMessages.add(new ChatRequestSystemMessage("Before continuing, REMOVE OLD CACHE."));
+        chatMessages.add(new ChatRequestSystemMessage(mainPrompt));
+        chatMessages.add(new ChatRequestUserMessage(transcribedCallInformation.getTranscribedText()));
+        ChatCompletions chatCompletions = client.getChatCompletions(deploymentOrModelId, new ChatCompletionsOptions(chatMessages));
 
-            StringBuilder sb = new StringBuilder();
-            for (ChatChoice choice : chatCompletions.getChoices()) {
-                ChatResponseMessage message = choice.getMessage();
-                sb.append(message.getContent()).append("\n");
-            }
-            CompletionsUsage usage = chatCompletions.getUsage();
-
-            logger.info("Analysis of {} completed successfully. Total tokens used: {}", Utils.removePathFromFilename(transcribedCallInformation.getPath()), usage.getTotalTokens());
-            return new AnalyzeResult(sb.toString(), usage.getTotalTokens());
-        } catch (IOException e) {
-            logger.error("An error occurred when reading prompt.txt: {}", e.getMessage());
-            throw new RuntimeException("Exception thrown in OpenAiAnalyzer, analyze " + e.getMessage());
+        StringBuilder sb = new StringBuilder();
+        for (ChatChoice choice : chatCompletions.getChoices()) {
+            ChatResponseMessage message = choice.getMessage();
+            sb.append(message.getContent()).append("\n");
         }
+        CompletionsUsage usage = chatCompletions.getUsage();
+
+        logger.info("Analysis of {} completed successfully. Total tokens used: {}", Utils.removePathFromFilename(transcribedCallInformation.getPath()), usage.getTotalTokens());
+        return new AnalyzeResult(sb.toString(), usage.getTotalTokens());
     }
 
     /**
@@ -141,13 +139,14 @@ public class OpenAIAnalyzer {
 
     /**
      * Build json file out of the analyzed call
+     *
      * @param analyzedCallResult the result of the analyzed call
-     * @param transcribedCall the transcribed call
+     * @param transcribedCall    the transcribed call
      * @return final result of the analyzed call in .json format
      */
     public AnalyzedCall buildJsonFile(AnalyzeResult analyzedCallResult, TranscribedCallInformation transcribedCall) {
         String analyzedCallJson = Utils.createJson(analyzedCallResult.result(), transcribedCall.getCallDuration(), analyzedCallResult.tokensUsed(), transcribedCall.getPath());
-        String analyzedCallJsonPath = Config.analyzedJsonSaveDirectory +    // The json save location folder
+        String analyzedCallJsonPath = config.utils.analyzedJsonSaveDirectory +    // The json save location folder
                 Utils.getFileName(transcribedCall.getPath()) // Adds the filename of the audiofile (removes path)
                 + ".json"; // Make it a json file
         AnalyzedCall analyzedCall = new AnalyzedCall(analyzedCallJsonPath, analyzedCallJson);

@@ -5,6 +5,7 @@ Information about the call: There will always be dialogue between two speakers. 
 Output Format:
 {
   "Summary": "concise summary",
+  "Solution": "how the case was resolved"
   "Keyword": {
     "Keyword": "keyword",
     "Confidence": "confidence score"
@@ -21,10 +22,6 @@ Output Format:
     "IssueSolved": "true/false",
     "Confidence": "confidence score"
   },
-  "AgentName": {
-    "Name": "agent",
-    "Confidence": "confidence score"
-  },
   "Language": {
     "LanguageCode": "language code",
     "Confidence": "confidence score"
@@ -36,14 +33,16 @@ Steps:
 2. Identify Main issue: Choose a generic keyword from the following alternatives that describes issue of the call best: ("lösenord", "VPN", "telefon", "surfplatta", "Konsultkonto", "email", "nätverk", "skrivare", "dator", "applikation","verksamhetssystem" ,"övrigt").
 3. Assess Caller Satisfaction: Give a 0-10 score based on sentiment.
 4. Department: Which management (förvaltning), operation (verksamhet) or unit (enhet) the caller calls from: ("kunskapskällan", "sundlergymnasiet", "individ och familjeomsorg", "socialtstöd", "bygg och miljö", "etc", "okänt").
-5. Identify agent name and extract it, choose ONLY from: ("alexander", "henrik", "linus", "axel").
-6. Identify if the issue is solved or not, answer with "true"(solved) "false"(unsolved).
-7. Identify which language is spoken, use the correct language code ("sv-SE","en-US", etc.).
+5. Identify if the issue is solved or not, answer with "true"(solved) "false"(unsolved).
+6. Identify which language is spoken, use the correct language code ("sv-SE","en-US", etc.).
+7. If the case was resolved add the solution, otherwise write "pågående"
 
 General instructions:
-Always write all answers in swedish and lowercase.
+Only use lowercase
+Always write Summary, Solution and Department in swedish.
+Always write IssueSolved with (true/false).
+Only use 1 keyword.
 When using quotes, ALWAYS use double quotes e.g. (") and NEVER use single quotes (').
 When identifying and extracting information from the call, provide how confident you are that the information you are extracting is correct on a scale from 0-100, without any suffix or prefix.
-When identifying and extracting agent name if you find similar names ("alexandra", "henke", "lines", "alex", etc) choose the closest from the list, or if you are unable to match agent name, write "okänd".
 Follow the steps and output in .JSON EXACTLY as shown (Output Format).
 Finish step 1 before working on step 2, finish step 2 before working on step 3 etc...
