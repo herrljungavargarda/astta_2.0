@@ -11,6 +11,7 @@ Subsequently,the analyzed data is formatted into JSON files, enabling efficient 
 
 - Java 17
 - JRE (Java Runtime Environment) [Download Java](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
+- Maven [Download Maven] (https://maven.apache.org/download.cgi)
 - Azure Speech To Text
 - Azure OpenAi
 - Blob storage (or any place to store audio/text files)
@@ -69,6 +70,12 @@ az keyvault set-policy --name Your-Key-Vault-Name --upn user@domain.com --secret
 #### 4. Saving output to dedicated storage as json format
 
 #### 5. Removes the original audio file from storage
+
+### 6. If you wish to compile the program in to a .jar file, run
+```Shell
+mvn clean compile assembly:single
+```
+ in root folder.
 
 ## Errors
 
