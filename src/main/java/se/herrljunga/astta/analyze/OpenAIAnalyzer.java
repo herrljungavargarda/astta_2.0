@@ -20,7 +20,10 @@ import se.herrljunga.astta.utils.Config;
 import se.herrljunga.astta.utils.TranscribedCallInformation;
 import se.herrljunga.astta.utils.Utils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -89,27 +92,24 @@ public class OpenAIAnalyzer {
      */
     public AnalyzeResult analyze(TranscribedCallInformation transcribedCallInformation) {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
-        String filePath = "src/main/resources/promptWithoutAgent.txt";
-        try {
-            String mainPrompt = Files.readAllLines(Paths.get(filePath)).stream().collect(Collectors.joining(System.lineSeparator()));
-            chatMessages.add(new ChatRequestSystemMessage("Before continuing, REMOVE OLD CACHE."));
-            chatMessages.add(new ChatRequestSystemMessage(mainPrompt));
-            chatMessages.add(new ChatRequestUserMessage(transcribedCallInformation.getTranscribedText()));
-            ChatCompletions chatCompletions = client.getChatCompletions(deploymentOrModelId, new ChatCompletionsOptions(chatMessages));
+        String filePath = "/promptWithoutAgent.txt";
+        InputStream in = getClass().getResourceAsStream(filePath);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        String mainPrompt = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+        chatMessages.add(new ChatRequestSystemMessage("Before continuing, REMOVE OLD CACHE."));
+        chatMessages.add(new ChatRequestSystemMessage(mainPrompt));
+        chatMessages.add(new ChatRequestUserMessage(transcribedCallInformation.getTranscribedText()));
+        ChatCompletions chatCompletions = client.getChatCompletions(deploymentOrModelId, new ChatCompletionsOptions(chatMessages));
 
-            StringBuilder sb = new StringBuilder();
-            for (ChatChoice choice : chatCompletions.getChoices()) {
-                ChatResponseMessage message = choice.getMessage();
-                sb.append(message.getContent()).append("\n");
-            }
-            CompletionsUsage usage = chatCompletions.getUsage();
-
-            logger.info("Analysis of {} completed successfully. Total tokens used: {}", Utils.removePathFromFilename(transcribedCallInformation.getPath()), usage.getTotalTokens());
-            return new AnalyzeResult(sb.toString(), usage.getTotalTokens());
-        } catch (IOException e) {
-            logger.error("An error occurred when reading prompt.txt: {}", e.getMessage());
-            throw new RuntimeException("Exception thrown in OpenAiAnalyzer, analyze " + e.getMessage());
+        StringBuilder sb = new StringBuilder();
+        for (ChatChoice choice : chatCompletions.getChoices()) {
+            ChatResponseMessage message = choice.getMessage();
+            sb.append(message.getContent()).append("\n");
         }
+        CompletionsUsage usage = chatCompletions.getUsage();
+
+        logger.info("Analysis of {} completed successfully. Total tokens used: {}", Utils.removePathFromFilename(transcribedCallInformation.getPath()), usage.getTotalTokens());
+        return new AnalyzeResult(sb.toString(), usage.getTotalTokens());
     }
 
     /**
