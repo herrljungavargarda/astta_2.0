@@ -10,6 +10,7 @@ import se.herrljunga.astta.keyvault.KeyVault;
 import se.herrljunga.astta.speechtotext.BatchTranscriber;
 import se.herrljunga.astta.utils.*;
 
+import java.io.File;
 import java.util.List;
 
 
@@ -49,6 +50,7 @@ public class App {
             e.printStackTrace();
             logger.error("Exception occured: ", e);
         } finally {
+            Utils.deleteFolderIfExists(new File(config.utils.pathToTemp));
             tempBlobStorage.deleteContainer();
             System.exit(0);
         }
