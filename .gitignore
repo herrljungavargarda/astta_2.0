@@ -42,6 +42,7 @@ build/
 .class
 
 /src/main/temp
+/temp
 
 /src/main/resources/exampleText.txt
 
