@@ -29,4 +29,11 @@ utils:
   transcriptionApiUrl: "https://swedencentral.api.cognitive.microsoft.com/speechtotext/v3.1/transcriptions/"
   transcriptionsApiUrlPreview: "https://swedencentral.api.cognitive.microsoft.com/speechtotext/v3.2-preview.2/transcriptions/"
 
+smtp:
+  smtpHost: "smtphost"
+  smtpPort: "smtpport"
+  smtpUsername: "smtpusername"
+  smtpPassword: "smtppassword"
+  smtpToAddress: "smtptoaddress"
+
 maxThreadsForAnalysis: 20

@@ -1,5 +1,7 @@
 package se.herrljunga.astta.utils;
 
+import se.herrljunga.astta.emailsender.EmailSender;
+
 import java.util.List;
 
 public class Config {
@@ -36,9 +38,18 @@ public class Config {
         public String transcriptionsApiUrlPreview;
     }
 
+    public static class EmailSender {
+        public String smtpHost;
+        public String smtpPort;
+        public String smtpUsername;
+        public String smtpPassword;
+        public String smtpToAddress;
+    }
+
     public SpeechToText speechToText;
     public BlobStorage blobStorage;
     public OpenAI openAI;
     public Utils utils;
+    public EmailSender emailSender;
     public int maxThreadsForAnalysis;
 }

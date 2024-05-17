@@ -4,12 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.herrljunga.astta.analyze.MultiThreadAnalyzer;
 import se.herrljunga.astta.analyze.OpenAIAnalyzer;
+import se.herrljunga.astta.emailsender.EmailSender;
 import se.herrljunga.astta.filehandler.BlobStorageHandler;
 import se.herrljunga.astta.filehandler.StorageHandler;
 import se.herrljunga.astta.keyvault.KeyVault;
 import se.herrljunga.astta.speechtotext.BatchTranscriber;
 import se.herrljunga.astta.utils.*;
 
+import javax.mail.MessagingException;
 import java.io.File;
 import java.util.List;
 
@@ -30,6 +32,7 @@ public class App {
             config.blobStorage.audioSourceContainerName);
     static MultiThreadAnalyzer multiThreadAnalyzer = new MultiThreadAnalyzer(new OpenAIAnalyzer(KeyVault.getSecret(config.openAI.secretName), KeyVault.getSecret(config.openAI.endpoint), config.openAI.model));
     static BatchTranscriber batchTranscriber = new BatchTranscriber();
+    static EmailSender emailSender = new EmailSender(KeyVault.getSecret(config.emailSender.smtpHost), KeyVault.getSecret(config.emailSender.smtpPort), KeyVault.getSecret(config.emailSender.smtpUsername), KeyVault.getSecret(config.emailSender.smtpPassword));
 
     public static void main(String[] args) {
         Logger logger = LoggerFactory.getLogger(App.class);
@@ -49,6 +52,12 @@ public class App {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Exception occured: ", e);
+            try {
+                emailSender.sendEmail(KeyVault.getSecret(config.emailSender.smtpToAddress), "Astta error!", e.getMessage());
+            }
+            catch (MessagingException ex) {
+                logger.error("Exception occured: ", ex);
+            }
         } finally {
             Utils.deleteFolderIfExists(new File(config.utils.pathToTemp));
             tempBlobStorage.deleteContainer();

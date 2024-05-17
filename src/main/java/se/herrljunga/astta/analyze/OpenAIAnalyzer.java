@@ -130,7 +130,7 @@ public class OpenAIAnalyzer {
             if (Utils.validateJson(analyzedCallResult.result())) {
                 break;
             } else if (i == 3) {
-                throw new RuntimeException("Couldn't create valid JSON file");
+                throw new RuntimeException("Couldn't create valid JSON file after 3 tries.");
             }
 
         }
