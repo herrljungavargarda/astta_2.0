@@ -32,7 +32,7 @@ public class App {
             config.blobStorage.audioSourceContainerName);
     static MultiThreadAnalyzer multiThreadAnalyzer = new MultiThreadAnalyzer(new OpenAIAnalyzer(KeyVault.getSecret(config.openAI.secretName), KeyVault.getSecret(config.openAI.endpoint), config.openAI.model));
     static BatchTranscriber batchTranscriber = new BatchTranscriber();
-    static EmailSender emailSender = new EmailSender(KeyVault.getSecret(config.emailSender.smtpHost), KeyVault.getSecret(config.emailSender.smtpPort), KeyVault.getSecret(config.emailSender.smtpUsername), KeyVault.getSecret(config.emailSender.smtpPassword));
+    static EmailSender emailSender = new EmailSender(KeyVault.getSecret(config.emailSender.smtpHost), KeyVault.getSecret(config.emailSender.smtpPort), KeyVault.getSecret(config.emailSender.smtpFromAddress));
 
     public static void main(String[] args) {
         Logger logger = LoggerFactory.getLogger(App.class);
@@ -49,6 +49,7 @@ public class App {
 
             // Run the whole analyze chain
             multiThreadAnalyzer.startAnalysis(transcribedCallInformations, powerBiBlobStorage, audioSource);
+
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("Exception occurred: ", e);

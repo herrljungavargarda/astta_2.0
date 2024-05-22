@@ -12,14 +12,12 @@ public class EmailSender {
 
     private String smtpHost;
     private String smtpPort;
-    private String username; // Server name
-    private String password;
+    private String fromAddress; // Server name
 
-    public EmailSender(String smtpHost, String smtpPort, String username, String password) {
+    public EmailSender(String smtpHost, String smtpPort, String fromAddress) {
         this.smtpHost = smtpHost;
         this.smtpPort = smtpPort;
-        this.username = username;
-        this.password = password;
+        this.fromAddress = fromAddress;
     }
 
     public void sendEmail(String toAddress, String subject, String message) throws MessagingException {
@@ -33,14 +31,14 @@ public class EmailSender {
         // Create a session with an authenticator
         Authenticator auth = new Authenticator() {
             public PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
+                return new PasswordAuthentication(fromAddress, "");
             }
         };
         Session session = Session.getInstance(properties, auth);
 
         // Create the email message
         Message msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress(username));
+        msg.setFrom(new InternetAddress(fromAddress));
         InternetAddress[] toAddresses = {new InternetAddress(toAddress)};
         msg.setRecipients(Message.RecipientType.TO, toAddresses);
         msg.setSubject(subject);

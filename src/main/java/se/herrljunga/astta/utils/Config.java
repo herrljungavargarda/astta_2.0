@@ -41,8 +41,7 @@ public class Config {
     public static class EmailSender {
         public String smtpHost;
         public String smtpPort;
-        public String smtpUsername;
-        public String smtpPassword;
+        public String smtpFromAddress;
         public String smtpToAddress;
     }
 

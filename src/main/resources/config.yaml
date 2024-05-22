@@ -32,8 +32,7 @@ utils:
 emailSender:
   smtpHost: "smtphost"
   smtpPort: "smtpport"
-  smtpUsername: "smtpusername"
-  smtpPassword: "smtppassword"
+  smtpFromAddress: "smtpfromaddress"
   smtpToAddress: "smtptoaddress"
 
 maxThreadsForAnalysis: 20
