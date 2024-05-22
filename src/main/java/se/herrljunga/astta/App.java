@@ -51,12 +51,12 @@ public class App {
             multiThreadAnalyzer.startAnalysis(transcribedCallInformations, powerBiBlobStorage, audioSource);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("Exception occured: ", e);
+            logger.error("Exception occurred: ", e);
             try {
                 emailSender.sendEmail(KeyVault.getSecret(config.emailSender.smtpToAddress), "Astta error!", e.getMessage());
             }
             catch (MessagingException ex) {
-                logger.error("Exception occured: ", ex);
+                logger.error("Exception occurred: ", ex);
             }
         } finally {
             Utils.deleteFolderIfExists(new File(config.utils.pathToTemp));

@@ -29,7 +29,7 @@ utils:
   transcriptionApiUrl: "https://swedencentral.api.cognitive.microsoft.com/speechtotext/v3.1/transcriptions/"
   transcriptionsApiUrlPreview: "https://swedencentral.api.cognitive.microsoft.com/speechtotext/v3.2-preview.2/transcriptions/"
 
-smtp:
+emailSender:
   smtpHost: "smtphost"
   smtpPort: "smtpport"
   smtpUsername: "smtpusername"
