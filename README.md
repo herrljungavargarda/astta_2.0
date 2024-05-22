@@ -26,9 +26,9 @@ Subsequently,the analyzed data is formatted into JSON files, enabling efficient 
 
 ## Configuring
 
-- Set up necessary keys and refer to them in Utils/Config (if using key vault, refer to the name you set)
+- Set up necessary keys and refer to them in config.yaml (if using key vault, refer to the name you set)
 - Set up Ai model, can be found and set up when signed in to Azure Portal under Azure OpenAi, Model deployments
-- To change the output format or add/remove anything you can edit the main prompt.
+- To change the output format or add/remove anything you can edit the main prompt (prompt.txt).
   We would recommend to follow the prompt style used.
 
 ### Key vault setup
@@ -71,7 +71,9 @@ az keyvault set-policy --name Your-Key-Vault-Name --upn user@domain.com --secret
 
 #### 5. Removes the original audio file from storage
 
-#### 6. If you wish to compile the program in to a .jar file, run
+#### 6. To run the project, go under src/main/resources and run either "run.sh" or "run.bat"
+
+#### 7. If you wish to compile the program in to a .jar file, run
 ```Shell
 mvn clean compile assembly:single
 ```
