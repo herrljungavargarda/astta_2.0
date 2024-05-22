@@ -39,7 +39,7 @@ Subsequently,the analyzed data is formatted into JSON files, enabling efficient 
 | `Open AI key`        | Can be found when signed in to Azure Portal under Azure OpenAi, Keys and Endpoint              |
 | `Speech to text key` | Can be found when signed in to Azure Portal under Speech service, Keys and Endpoint            |
 ------------
-![keyvault](./readmeResources/keyvault.png)
+![keyvault](./readmeResources/keyvault2.png)
 
 ### Setup key vault authentication on local machine:
 
