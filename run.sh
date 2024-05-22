@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Navigate to the project directory (optional, if needed)
-cd ../../..
 
 # Run the Maven command
 mvn compile exec:java

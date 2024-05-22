@@ -12,7 +12,7 @@ public class EmailSender {
 
     private String smtpHost;
     private String smtpPort;
-    private String username;
+    private String username; // Server name
     private String password;
 
     public EmailSender(String smtpHost, String smtpPort, String username, String password) {

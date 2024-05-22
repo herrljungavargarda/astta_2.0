@@ -1,7 +1,6 @@
 @echo off
 
 REM Navigate to the project directory (optional, if needed)
-cd ..\..\..
 
 REM Run the Maven command
 mvn compile exec:java
