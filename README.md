@@ -65,7 +65,7 @@ az keyvault set-policy --name Your-Key-Vault-Name --upn user@domain.com --secret
 
 #### 2. Creates a thread for each transcription
 
-#### 3. Analyzing the transcribed text using Azure OpenAi
+#### 3. Analyzing the transcribed text using Azure OpenAi 
 
 #### 4. Saving output to dedicated storage as json format
 
