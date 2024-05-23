@@ -36,8 +36,16 @@ Subsequently,the analyzed data is formatted into JSON files, enabling efficient 
 | Key                  | Description                                                                                    |
 |----------------------|------------------------------------------------------------------------------------------------|
 | `Blob SAS token`     | Can be generated when signed in to Azure Portal under Storage account, Shared access signature |
+| `Blob Storage Endpoint` | Can be found in Microsoft Azure Storage Explorer                                            |
+| `Blob Account Name`  | Can be found in  Microsoft Azure Storage Explorer                                              |
+| `Blob Account Key`   | Can be found in Microsoft Azure Storage Explorer                                               |
 | `Open AI key`        | Can be found when signed in to Azure Portal under Azure OpenAi, Keys and Endpoint              |
+| `Open AI Endpoint`   | Can be found when signed in to Azure Portal under Azure OpenAi, Keys and Endpoint              |
 | `Speech to text key` | Can be found when signed in to Azure Portal under Speech service, Keys and Endpoint            |
+| `Smtp Host`          | The name of the smtp server (if you have one)                                                  |
+| `Smtp Port`          | The smtp port number                                                                           |
+| `Smtp From Address`  | The mail address you wish to send error logs from                                              |
+| `Smtp To Address`    | The mail address you wish to send error logs to                                                |
 ------------
 ![keyvault](./readmeResources/keyvault2.png)
 
