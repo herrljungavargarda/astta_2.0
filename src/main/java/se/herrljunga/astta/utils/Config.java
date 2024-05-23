@@ -33,7 +33,6 @@ public class Config {
         public String pathToTemp;
         public String analyzedJsonSaveDirectory;
         public String transcribedTextSaveDirectory;
-        public String sasTokenTranscriptionBlobSecretName;
         public String transcriptionApiUrl;
         public String transcriptionsApiUrlPreview;
     }

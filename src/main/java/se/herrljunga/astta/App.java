@@ -41,14 +41,14 @@ public class App {
             // Transcribe:
             batchTranscriber.startTranscription();
 
-            List<String> transcribedPaths = tempBlobStorage.fetchFile();
-
-            List<String> filteredTranscribedPaths = Utils.extractReport(transcribedPaths, reportBlobStorage);
-
-            List<TranscribedCallInformation> transcribedCallInformations = OpenAIAnalyzer.extractInformationFromTranscribedFiles(filteredTranscribedPaths);
+            //List<String> transcribedPaths = tempBlobStorage.fetchFile();
+//
+            //List<String> filteredTranscribedPaths = Utils.extractReport(transcribedPaths, reportBlobStorage);
+//
+            //List<TranscribedCallInformation> transcribedCallInformations = OpenAIAnalyzer.extractInformationFromTranscribedFiles(filteredTranscribedPaths);
 
             // Run the whole analyze chain
-            multiThreadAnalyzer.startAnalysis(transcribedCallInformations, powerBiBlobStorage, audioSource);
+            //multiThreadAnalyzer.startAnalysis(transcribedCallInformations, powerBiBlobStorage, audioSource);
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -25,7 +25,6 @@ utils:
   pathToTemp: "temp/"
   analyzedJsonSaveDirectory: "temp/analyzed/"
   transcribedTextSaveDirectory: "temp/"
-  sasTokenTranscriptionBlobSecretName: "sasTokenTranscriptionBlob"
   transcriptionApiUrl: "https://swedencentral.api.cognitive.microsoft.com/speechtotext/v3.1/transcriptions/"
   transcriptionsApiUrlPreview: "https://swedencentral.api.cognitive.microsoft.com/speechtotext/v3.2-preview.2/transcriptions/"
 
