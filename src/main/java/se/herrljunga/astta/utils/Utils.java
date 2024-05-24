@@ -9,9 +9,8 @@ import se.herrljunga.astta.filehandler.StorageHandler;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -192,11 +191,9 @@ public class Utils {
      */
     public static void writeToFile(AnalyzedCall analyzedCall) {
         logger.info("Writing to file: {}", analyzedCall.savePath());
-        try {
-            FileWriter fileWriter = new FileWriter(analyzedCall.savePath());
-            fileWriter.write(analyzedCall.analyzedCallJson());
-            fileWriter.flush();
-            fileWriter.close();
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(analyzedCall.savePath()), StandardCharsets.UTF_8)) {
+            writer.write(analyzedCall.analyzedCallJson());
+            writer.flush();
             logger.info("Done writing to file: {}", analyzedCall.savePath());
         } catch (IOException e) {
             logger.error("An error occurred when trying to write to file.{}", e);
